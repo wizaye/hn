@@ -1,7 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { EnquiryItem } from "@/lib/types";
+
+const CART_STORAGE_KEY = "enquiry-cart";
 
 interface EnquiryCartContextType {
   items: EnquiryItem[];
@@ -10,6 +12,7 @@ interface EnquiryCartContextType {
   updateCartItem: (productId: string, variantId: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
+  uniqueProductsCount: number;
   getCartItem: (productId: string, variantId: string) => EnquiryItem | undefined;
   getProductCartItems: (productId: string) => EnquiryItem[];
   isProductInCart: (productId: string) => boolean;
@@ -18,7 +21,37 @@ interface EnquiryCartContextType {
 const EnquiryCartContext = createContext<EnquiryCartContextType | undefined>(undefined);
 
 export function EnquiryCartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<EnquiryItem[]>([]);
+  const [items, setItems] = useState<EnquiryItem[]>(() => {
+    // Initialize from localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(CART_STORAGE_KEY);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (error) {
+        console.error("Failed to load cart from localStorage:", error);
+      }
+    }
+    return [];
+  });
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Mark as initialized after mount
+  useEffect(() => {
+    setIsInitialized(true);
+  }, []);
+
+  // Save cart to localStorage whenever items change
+  useEffect(() => {
+    if (isInitialized) {
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+      } catch (error) {
+        console.error("Failed to save cart to localStorage:", error);
+      }
+    }
+  }, [items, isInitialized]);
 
   const addToCart = (item: EnquiryItem) => {
     setItems((prev) => {
@@ -71,6 +104,9 @@ export function EnquiryCartProvider({ children }: { children: ReactNode }) {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  
+  // Count unique products (distinct productIds)
+  const uniqueProductsCount = new Set(items.map((item) => item.productId)).size;
 
   return (
     <EnquiryCartContext.Provider
@@ -84,6 +120,7 @@ export function EnquiryCartProvider({ children }: { children: ReactNode }) {
         getProductCartItems,
         isProductInCart,
         totalItems,
+        uniqueProductsCount,
       }}
     >
       {children}

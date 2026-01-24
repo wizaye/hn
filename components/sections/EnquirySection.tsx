@@ -54,11 +54,11 @@ export function EnquirySection() {
   };
 
   return (
-    <section id="enquiry-section" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-muted/50">
+    <section id="enquiry-section" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6 md:px-8 max-w-7xl">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
-            Ready to Place an Order?
+          <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl md:text-4xl font-medium text-muted-foreground tracking-tight">
+            Ready to <span className="text-foreground">Place an Order?</span>
           </h2>
           <p className="mb-6 sm:mb-8 text-sm sm:text-base md:text-lg text-muted-foreground px-4">
             Submit your enquiry and our team will get back to you with pricing and customization options.
@@ -74,7 +74,7 @@ export function EnquirySection() {
               <DialogHeader>
                 <DialogTitle>Submit Your Enquiry</DialogTitle>
                 <DialogDescription>
-                  Fill out the form below and we'll contact you within 24 hours.
+                  Fill out the form below and we&apos;ll contact you within 24 hours.
                 </DialogDescription>
               </DialogHeader>
               

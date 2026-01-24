@@ -2,25 +2,16 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { bestSellingProducts } from "@/lib/data";
 import { ProductCard } from "@/components/products/ProductCard";
 
 export function BestSellers() {
   return (
-    <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-muted/50">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6 md:px-8 max-w-7xl">
         <div className="mb-8 sm:mb-10 md:mb-12 text-center">
-          <h2 className="mb-2 sm:mb-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
-            Best Sellers Across Categories
+          <h2 className="mb-2 sm:mb-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-muted-foreground tracking-tight">
+            Best Sellers <span className="text-foreground">Across Categories</span>
           </h2>
         </div>
 

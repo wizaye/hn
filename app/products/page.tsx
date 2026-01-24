@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -23,15 +23,13 @@ import {
 } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/products/ProductCard";
-import { EnquiryCart, CartOpenProvider } from "@/components/products/EnquiryCart";
+import { EnquiryCart } from "@/components/products/EnquiryCart";
 import { products } from "@/lib/data";
 import { Product } from "@/lib/types";
-import { EnquiryCartProvider } from "@/hooks/use-enquiry-cart";
-import { Toaster } from "@/components/ui/sonner";
 
 const PRODUCTS_PER_PAGE = 12;
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get("category") || "all";
   
@@ -116,11 +114,9 @@ export default function ProductsPage() {
   };
 
   return (
-    <EnquiryCartProvider>
-      <CartOpenProvider>
-        <div className="min-h-screen">
-        <Navbar />
-        <main className="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
+    <div className="min-h-screen">
+      <Navbar />
+      <main className="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
           {/* Top Controls */}
           <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
             <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
@@ -257,10 +253,29 @@ export default function ProductsPage() {
         <EnquiryCart />
 
         <Footer />
-        <Toaster />
         </div>
-      </CartOpenProvider>
-    </EnquiryCartProvider>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen">
+        <Navbar />
+        <main className="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
+          <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="h-[400px] sm:h-[450px] md:h-[500px] w-full rounded-lg" />
+              </div>
+            ))}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }
 

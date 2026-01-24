@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronDown, X } from "lucide-react";
+import { Menu, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   NavigationMenu,
@@ -11,6 +11,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import {
   Collapsible,
@@ -18,6 +19,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
+import { NoiseBackground } from "@/components/ui/noise-background";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -38,40 +40,30 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <NavigationMenu className="hidden lg:flex ml-4">
+        <NavigationMenu className="hidden lg:flex ml-6">
           <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link
-                  href="/"
-                  className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all text-muted-foreground hover:text-foreground bg-transparent hover:bg-transparent h-8 rounded-md gap-1.5 px-3"
-                >
-                  Home
-                </Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuTrigger>Products</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <div className="grid gap-3 p-6 w-[400px]">
+                <div className="grid gap-0.5 p-2 w-[240px]">
                   <NavigationMenuLink asChild>
                     <Link
                       href="/products"
-                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     >
                       <div className="text-sm font-medium leading-none">All Categories</div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                        Browse our complete catalog of clocks
+                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
+                        Browse our complete catalog
                       </p>
                     </Link>
                   </NavigationMenuLink>
                   <NavigationMenuLink asChild>
                     <Link
                       href="/products?category=wall-clocks"
-                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     >
                       <div className="text-sm font-medium leading-none">Wall Clocks</div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
                         Premium wall clocks for offices
                       </p>
                     </Link>
@@ -79,10 +71,10 @@ export function Navbar() {
                   <NavigationMenuLink asChild>
                     <Link
                       href="/products?category=desk-clocks"
-                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     >
                       <div className="text-sm font-medium leading-none">Desk Clocks</div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
                         Elegant desk clocks for executives
                       </p>
                     </Link>
@@ -90,22 +82,22 @@ export function Navbar() {
                   <NavigationMenuLink asChild>
                     <Link
                       href="/products?category=premium-gifting"
-                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     >
                       <div className="text-sm font-medium leading-none">Premium Gifting</div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                        Perfect for corporate gifting programs
+                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
+                        Perfect for corporate gifting
                       </p>
                     </Link>
                   </NavigationMenuLink>
                   <NavigationMenuLink asChild>
                     <Link
                       href="/products?category=personalized"
-                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     >
                       <div className="text-sm font-medium leading-none">Personalized</div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                        Customizable with your company logo
+                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
+                        Custom with your company logo
                       </p>
                     </Link>
                   </NavigationMenuLink>
@@ -113,31 +105,15 @@ export function Navbar() {
               </NavigationMenuContent>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link
-                  href="/#custom-work"
-                  className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all text-muted-foreground hover:text-foreground bg-transparent hover:bg-transparent h-8 rounded-md gap-1.5 px-3"
-                >
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                <Link href="/#custom-work">
                   Custom Work
                 </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link
-                  href="/#about"
-                  className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all text-muted-foreground hover:text-foreground bg-transparent hover:bg-transparent h-8 rounded-md gap-1.5 px-3"
-                >
-                  About
-                </Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all text-muted-foreground hover:text-foreground bg-transparent hover:bg-transparent h-8 rounded-md gap-1.5 px-3"
-                >
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                <Link href="/contact">
                   Contact
                 </Link>
               </NavigationMenuLink>
@@ -147,12 +123,21 @@ export function Navbar() {
 
         {/* Desktop CTA Button */}
         <div className="ml-auto flex items-center gap-2 lg:flex-1 lg:justify-end">
-          <Button
-            asChild
-            className="h-8 px-4 text-[13px] bg-linear-to-b from-[#2487EB] to-[#1D69DE] border border-[#1D69DE] hover:from-[#2487EB]/90 hover:to-[#1D69DE]/90 text-white hidden lg:flex"
+          <NoiseBackground
+            containerClassName="hidden lg:block p-1 rounded-full"
+            gradientColors={[
+              "rgb(255, 100, 150)",
+              "rgb(100, 150, 255)",
+              "rgb(255, 200, 100)",
+            ]}
           >
-            <Link href="/enquire">Enquire Now</Link>
-          </Button>
+            <Link
+              href="/enquire"
+              className="flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-neutral-100 via-neutral-100 to-white px-4 py-1.5 text-xs font-medium text-black shadow-[0px_2px_0px_0px_rgb(245,245,245)_inset,0px_0.5px_1px_0px_rgb(163,163,163)] transition-all duration-100 active:scale-[0.98] dark:from-black dark:via-black dark:to-neutral-900 dark:text-white dark:shadow-[0px_1px_0px_0px_rgb(10,10,10)_inset,0px_1px_0px_0px_rgb(38,38,38)] hover:shadow-md"
+            >
+              Enquire Now &rarr;
+            </Link>
+          </NoiseBackground>
         </div>
 
         {/* Mobile Menu Button - Moved to Right */}
@@ -183,24 +168,17 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Menu Dropdown - Overlays content */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="border-b bg-background/95 backdrop-blur-sm lg:hidden overflow-hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-full left-0 right-0 z-50 border-b rounded-b-xl bg-background/95 backdrop-blur-sm lg:hidden shadow-lg"
           >
             <nav className="container mx-auto px-4 py-4 space-y-1">
-              <Link
-                href="/"
-                className="flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
-                onClick={() => setIsOpen(false)}
-              >
-                Home
-              </Link>
-
               {/* Products Collapsible */}
               <Collapsible open={isProductsOpen} onOpenChange={setIsProductsOpen}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent text-left">
@@ -259,13 +237,6 @@ export function Navbar() {
                 Custom Work
               </Link>
               <Link
-                href="/#about"
-                className="flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
-                onClick={() => setIsOpen(false)}
-              >
-                About
-              </Link>
-              <Link
                 href="/contact"
                 className="flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
                 onClick={() => setIsOpen(false)}
@@ -274,11 +245,22 @@ export function Navbar() {
               </Link>
 
               <div className="pt-3 mt-3 border-t">
-                <Button asChild className="w-full bg-linear-to-b from-[#2487EB] to-[#1D69DE] border border-[#1D69DE] hover:from-[#2487EB]/90 hover:to-[#1D69DE]/90 text-white">
-                  <Link href="/enquire" onClick={() => setIsOpen(false)}>
+                <NoiseBackground
+                  containerClassName="w-full p-1 rounded-full"
+                  gradientColors={[
+                    "rgb(255, 100, 150)",
+                    "rgb(100, 150, 255)",
+                    "rgb(255, 200, 100)",
+                  ]}
+                >
+                  <Link
+                    href="/enquire"
+                    onClick={() => setIsOpen(false)}
+                    className="flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-neutral-100 via-neutral-100 to-white px-6 py-2.5 text-sm font-medium text-black shadow-[0px_2px_0px_0px_rgb(245,245,245)_inset,0px_0.5px_1px_0px_rgb(163,163,163)] transition-all duration-100 active:scale-[0.98] dark:from-black dark:via-black dark:to-neutral-900 dark:text-white dark:shadow-[0px_1px_0px_0px_rgb(10,10,10)_inset,0px_1px_0px_0px_rgb(38,38,38)] hover:shadow-md"
+                  >
                     Enquire Now &rarr;
                   </Link>
-                </Button>
+                </NoiseBackground>
               </div>
             </nav>
           </motion.div>

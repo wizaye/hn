@@ -1,13 +1,13 @@
 "use client";
 
-import { Marquee } from "@/components/ui/marquee";
+import { FramerCarousel } from "@/components/ui/framer-carousel";
 
 const images = [
-  "/api/placeholder/400/300",
-  "/api/placeholder/400/300",
-  "/api/placeholder/400/300",
-  "/api/placeholder/400/300",
-  "/api/placeholder/400/300",
+  "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=800&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=800&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1495364141860-b0d03eccd065?w=800&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1577201227227-b275785d8ee4?w=800&h=600&fit=crop",
 ];
 
 export function About() {
@@ -17,23 +17,23 @@ export function About() {
         <div className="grid gap-8 sm:gap-10 md:gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
           {/* Left Column - Text */}
           <div className="flex flex-col justify-center space-y-4 sm:space-y-6">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
-              About Hyderabad Networks
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-muted-foreground tracking-tight">
+              About <span className="text-foreground">Hyderabad Networks</span>
             </h2>
             <div className="space-y-3 sm:space-y-4 text-sm sm:text-base md:text-lg text-muted-foreground">
-              <p>
+              <p className="text-justify">
                 We specialize in premium corporate clock solutions for bulk
                 gifting programs. With years of experience in manufacturing and
                 customization, we help enterprises create memorable branded
                 experiences.
               </p>
-              <p>
+              <p className="text-justify">
                 Our expertise includes bulk manufacturing, custom branding,
                 laser engraving, logo printing, and personalized packaging. We
                 work with businesses of all sizes to deliver high-quality clock
                 solutions that reflect your brand identity.
               </p>
-              <p>
+              <p className="text-justify">
                 Trusted by leading corporations, we understand the
                 importance of quality, timely delivery, and exceptional
                 customer service in B2B relationships.
@@ -41,18 +41,9 @@ export function About() {
             </div>
           </div>
 
-          {/* Right Column - Carousel */}
-          <div className="relative">
-            <Marquee pauseOnHover className="[--duration:20s]">
-              {images.map((image, idx) => (
-                <div
-                  key={idx}
-                  className="relative h-[200px] w-[280px] sm:h-[250px] sm:w-[350px] md:h-[300px] md:w-[400px] overflow-hidden rounded-lg border bg-muted"
-                >
-                  <div className="h-full w-full bg-gradient-to-br from-primary/20 to-primary/5" />
-                </div>
-              ))}
-            </Marquee>
+          {/* Right Column - Autoplay Carousel */}
+          <div className="relative h-[250px] sm:h-[300px] lg:h-[350px] xl:h-[400px] rounded-lg overflow-hidden border">
+            <FramerCarousel images={images} autoplayInterval={4000} className="w-full h-full" />
           </div>
         </div>
       </div>

@@ -1,22 +1,36 @@
 "use client";
 
-import { useState, useMemo, createContext, useContext, ReactNode } from "react";
-import { ShoppingCart, Trash2 } from "lucide-react";
+import { useState, useMemo, createContext, useContext, ReactNode, useEffect } from "react";
+import { ShoppingCart, Trash2, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
 import { products } from "@/lib/data";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+// Hook to detect mobile screen
+function useIsMobile(breakpoint: number = 640) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < breakpoint);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, [breakpoint]);
+
+  return isMobile;
+}
 
 // Context for controlling cart open state
 const CartOpenContext = createContext<{
@@ -48,9 +62,29 @@ interface EnquiryCartProps {
 }
 
 export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps = {}) {
-  const { items, removeFromCart, updateCartItem, totalItems } = useEnquiryCart();
+  const { items, removeFromCart, updateCartItem, totalItems, uniqueProductsCount } = useEnquiryCart();
   const cartContext = useCartOpen();
   const [internalOpen, setInternalOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const pathname = usePathname();
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  // Check if we're on the products page
+  const isProductsPage = pathname === "/products" || pathname.startsWith("/products");
+  
+  // Track scroll position for scroll-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+  
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   
   // Use controlled state if provided, otherwise use context, otherwise use internal state
   const isOpen = controlledOpen !== undefined ? controlledOpen : (cartContext.isOpen ?? internalOpen);
@@ -79,56 +113,86 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
     setEditingQuantities({ ...editingQuantities, [key]: value });
   };
 
-  const handleQuantityBlur = (productId: string, variantId: string) => {
+  const handleQuantityBlur = (productId: string, variantId: string, currentQty: number) => {
     const key = `${productId}-${variantId}`;
-    const value = editingQuantities[key];
-    const quantity = parseInt(value || "1");
-    if (quantity >= 1) {
-      updateCartItem(productId, variantId, quantity);
+    
+    // Only update if the key exists in editingQuantities (user actually edited)
+    if (key in editingQuantities) {
+      const value = editingQuantities[key];
+      const quantity = parseInt(value || "1");
+      if (quantity >= 1) {
+        updateCartItem(productId, variantId, quantity);
+      } else {
+        // If invalid, reset to current quantity
+        updateCartItem(productId, variantId, currentQty);
+      }
+      // Remove the key
+      const newEditingQuantities = { ...editingQuantities };
+      delete newEditingQuantities[key];
+      setEditingQuantities(newEditingQuantities);
     }
-    setEditingQuantities({ ...editingQuantities, [key]: "" });
   };
 
   const getQuantityValue = (productId: string, variantId: string, currentQty: number) => {
     const key = `${productId}-${variantId}`;
-    return editingQuantities[key] !== undefined ? editingQuantities[key] : currentQty.toString();
+    // Only use editing value if it exists and is not undefined
+    if (key in editingQuantities) {
+      return editingQuantities[key];
+    }
+    return currentQty.toString();
   };
 
   return (
     <>
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild>
-          <Button
-            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow"
-            size="icon"
-          >
-            <ShoppingCart className="h-6 w-6" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground animate-in zoom-in-50">
-                {totalItems}
-              </span>
-            )}
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="right" className="w-full sm:w-[450px] flex flex-col">
-          <SheetHeader className="border-b pb-4">
-            <SheetTitle className="text-2xl">Enquiry Cart</SheetTitle>
-            <SheetDescription>
+      {/* Scroll to Top Button - Show when NOT on products page and scrolled down */}
+      {!isProductsPage && showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all"
+          size="icon"
+        >
+          <ArrowUp className="h-6 w-6" />
+        </Button>
+      )}
+      
+      {/* Cart Button & Drawer - Only show on products page */}
+      {isProductsPage && (
+        <Drawer open={isOpen} onOpenChange={setIsOpen} direction={isMobile ? "bottom" : "right"}>
+          <DrawerTrigger asChild>
+            <Button
+              className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+              size="icon"
+            >
+              <ShoppingCart className="h-6 w-6" />
+              {uniqueProductsCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground animate-in zoom-in-50">
+                  {uniqueProductsCount}
+                </span>
+              )}
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent className={isMobile 
+          ? "h-[85vh] flex flex-col p-0 overflow-x-hidden rounded-t-2xl" 
+          : "h-full w-full sm:w-[450px] sm:max-w-[450px] flex flex-col p-0 overflow-x-hidden rounded-l-2xl"
+        }>
+          <DrawerHeader className="border-b p-5 pb-4 bg-gradient-to-r from-background to-muted/30">
+            <DrawerTitle className="text-2xl">Enquiry Cart</DrawerTitle>
+            <DrawerDescription>
               Review your selected products and submit your enquiry
-            </SheetDescription>
-            {totalItems > 0 && (
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant="secondary" className="text-xs">
-                  {items.length} {items.length === 1 ? "variant" : "variants"}
+            </DrawerDescription>
+            {uniqueProductsCount > 0 && (
+              <div className="flex items-center gap-2 mt-3">
+                <Badge variant="secondary" className="text-xs rounded-full px-3">
+                  {uniqueProductsCount} {uniqueProductsCount === 1 ? "product" : "products"}
                 </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  {totalItems} {totalItems === 1 ? "item" : "items"} total
+                <Badge variant="secondary" className="text-xs rounded-full px-3">
+                  {items.length} {items.length === 1 ? "variant" : "variants"}
                 </Badge>
               </div>
             )}
-          </SheetHeader>
+          </DrawerHeader>
 
-          <div className="flex-1 overflow-y-auto py-6">
+          <div className="flex-1 overflow-y-auto px-4 py-6">
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-12 text-center">
                 <div className="relative mb-6">
@@ -164,7 +228,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                       </div>
 
                       {/* Variants List - Table-like format */}
-                      <div className="rounded-lg border divide-y">
+                      <div className="rounded-xl border bg-card/50 divide-y overflow-hidden">
                         {productItems.map((item, idx) => {
                           const variant = product?.variants.find((v) => v.id === item.variantId);
                           const itemTotal = item.quantity * item.price;
@@ -205,7 +269,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                                         handleQuantityChange(item.productId, item.variantId, value);
                                       }
                                     }}
-                                    onBlur={() => handleQuantityBlur(item.productId, item.variantId)}
+                                    onBlur={() => handleQuantityBlur(item.productId, item.variantId, item.quantity)}
                                     className="w-16 h-8 text-center text-sm"
                                   />
                                 </div>
@@ -238,9 +302,8 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
 
           {items.length > 0 && (
             <>
-              <Separator />
-              <div className="border-t bg-muted/30 p-4 space-y-4">
-                <div className="space-y-2">
+              <div className="border-t bg-gradient-to-t from-muted/50 to-background p-5 space-y-4">
+                <div className="space-y-2 rounded-xl bg-card/80 p-4 border">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Total Variants:</span>
                     <span className="font-medium">{items.length}</span>
@@ -256,7 +319,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                 </div>
                 <Button
                   asChild
-                  className="w-full"
+                  className="w-full rounded-xl"
                   size="lg"
                 >
                   <Link href="/enquire" onClick={() => setIsOpen(false)}>
@@ -266,8 +329,9 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
               </div>
             </>
           )}
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
+      )}
     </>
   );
 }

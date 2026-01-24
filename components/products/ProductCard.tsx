@@ -6,10 +6,15 @@ import { NoiseBackground } from "@/components/ui/noise-background";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Product } from "@/lib/types";
 import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
 import { AddToEnquiryModal } from "./AddToEnquiryModal";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Maximize2 } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -37,7 +42,9 @@ const Card = ({
 
 export function ProductCard({ product, showAddToEnquiry = false }: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { getProductCartItems, removeFromCart, isProductInCart } = useEnquiryCart();
+  const [imageError, setImageError] = useState(false);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const { getProductCartItems, removeFromCart } = useEnquiryCart();
 
   // Get unique colors from variants
   const availableColors = product.variants
@@ -79,11 +86,54 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
         >
           <Card>
             {/* Product Image */}
-            <div className="relative h-48 sm:h-52 md:h-56 lg:h-60 w-full overflow-hidden">
-              <div className="h-full w-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl sm:text-4xl">🕐</span>
-              </div>
+            <div className="relative h-48 sm:h-52 md:h-56 lg:h-60 w-full overflow-hidden group">
+              {product.image && product.image.includes('unsplash') && !imageError ? (
+                <>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={() => setImageError(true)}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  
+                  {/* Hover Overlay with Enlarge Button */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <Dialog open={isZoomOpen} onOpenChange={setIsZoomOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="bg-white/90 hover:bg-white text-black"
+                        >
+                          <Maximize2 className="mr-2 h-4 w-4" />
+                          Enlarge
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl w-[90vw] p-2">
+                        <div className="relative w-full aspect-square">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-contain rounded-lg"
+                          />
+                        </div>
+                        <div className="text-center mt-4">
+                          <h3 className="text-lg font-semibold">{product.name}</h3>
+                          <p className="text-sm text-muted-foreground">{product.description}</p>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="h-full w-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-3xl sm:text-4xl">🕐</span>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Product Content - Fixed height container */}

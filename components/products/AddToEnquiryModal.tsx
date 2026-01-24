@@ -45,37 +45,34 @@ export function AddToEnquiryModal({
 
   const cartItems = getProductCartItems(product.id);
 
-  // Reset form when modal opens
+  // Initialize form state when modal opens or editing changes
   useEffect(() => {
-    if (open) {
-      setSelectedVariant(product.variants[0]?.id || "");
-      setQuantity("1");
-      setEditingVariantId(undefined);
-    }
-  }, [open, product.variants]);
-
-  // When editing a variant, pre-fill the form
-  useEffect(() => {
+    if (!open) return;
+    
+    // Use a flag to batch state updates
+    const updates = {
+      variant: '',
+      quantity: '1'
+    };
+    
     if (editingVariantId) {
-      setSelectedVariant(editingVariantId);
+      updates.variant = editingVariantId;
       const existingItem = getCartItem(product.id, editingVariantId);
       if (existingItem) {
-        setQuantity(existingItem.quantity.toString());
+        updates.quantity = existingItem.quantity.toString();
       }
-    }
-  }, [editingVariantId, product.id, getCartItem]);
-
-  // Reset when variant changes (if not editing)
-  useEffect(() => {
-    if (!editingVariantId) {
-      const existingItem = getCartItem(product.id, selectedVariant);
+    } else {
+      updates.variant = product.variants[0]?.id || "";
+      const existingItem = getCartItem(product.id, updates.variant);
       if (existingItem) {
-        setQuantity(existingItem.quantity.toString());
-      } else {
-        setQuantity("1");
+        updates.quantity = existingItem.quantity.toString();
       }
     }
-  }, [selectedVariant, product.id, editingVariantId, getCartItem]);
+    
+    // Batch updates
+    setSelectedVariant(updates.variant);
+    setQuantity(updates.quantity);
+  }, [open, editingVariantId, product.id, product.variants, getCartItem]);
 
   const handleUpdateCart = async () => {
     const variant = product.variants.find((v) => v.id === selectedVariant);

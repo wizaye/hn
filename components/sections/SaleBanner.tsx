@@ -1,42 +1,47 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Gift, Sparkles, TrendingDown, Truck } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const messages = [
   {
-    title: "Bulk Orders Open!",
-    description: "Get your hands on premium corporate clocks at unbeatable prices—limited time only!",
-    icon: Gift,
+    title: "🎁 Bulk Orders Open!",
+    description: "Premium corporate clocks at unbeatable prices - Limited Time Only",
+    mobileDescription: "Premium clocks - Limited Time",
   },
   {
-    title: "Custom Branding Available",
-    description: "Professional logo engraving and printing services for your corporate gifting needs",
-    icon: Sparkles,
+    title: "✨ Custom Branding",
+    description: "Professional logo engraving & printing services - Free Design Mockup",
+    mobileDescription: "Logo engraving & printing",
   },
   {
-    title: "Special Discounts",
-    description: "Save more on orders above 100 units—perfect for large organizations!",
-    icon: TrendingDown,
+    title: "💰 Special Discounts",
+    description: "Save big on orders above 100 units - Up to 30% Off",
+    mobileDescription: "Up to 30% Off on bulk orders",
   },
   {
-    title: "Free Delivery",
-    description: "Complimentary shipping on all bulk corporate orders across India",
-    icon: Truck,
+    title: "🚚 Free Delivery",
+    description: "Complimentary shipping on bulk orders - All India",
+    mobileDescription: "Free shipping - All India",
   },
 ];
 
 export function SaleBanner() {
   const [isVisible, setIsVisible] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (!isVisible) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % messages.length);
-    }, 5000); // Change message every 5 seconds
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % messages.length);
+        setIsTransitioning(false);
+      }, 300);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [isVisible]);
@@ -44,33 +49,62 @@ export function SaleBanner() {
   if (!isVisible) return null;
 
   const currentMessage = messages[currentIndex];
-  const Icon = currentMessage.icon;
 
   return (
-    <div className="sticky top-0 z-50 w-full text-foreground cursor-pointer bg-linear-to-b from-[#FBBF24] to-[#F59E0B] py-1.5 dark:from-[#2487EB] dark:to-[#1D69DE]">
-      <div className="mx-auto flex max-w-7xl gap-x-2 px-4 md:items-center">
-        <div className="flex grow gap-3 md:items-center">
-          <div
-            className="flex size-7 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 max-md:mt-0.5"
-            aria-hidden="true"
-          >
-            <Icon className="h-4 w-4 opacity-80" />
-          </div>
-          <div className="flex grow flex-col justify-between gap-1 md:flex-row md:items-center transition-opacity duration-300">
-            <div className="mt-0.5 flex flex-col items-start gap-1 md:mt-0 md:flex-row md:items-center">
-              <p className="text-sm font-medium">{currentMessage.title}</p>
-              <p className="text-foreground/80 text-sm">{currentMessage.description}</p>
+    <div className="sticky top-0 z-30 w-full bg-black transition-all duration-500">
+      <div className="relative overflow-hidden">
+        <div className="relative mx-auto max-w-7xl px-3 sm:px-4 md:px-6">
+          <div className="flex items-center justify-between gap-2 py-1.5 sm:py-2">
+            {/* Main Content - Centered */}
+            <div className={`flex flex-1 items-center justify-center gap-2 min-w-0 transition-all duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+              <div className="text-center">
+                <span className="text-[10px] sm:text-xs md:text-sm font-bold text-white">
+                  {currentMessage.title}
+                </span>
+                <span className="mx-1.5 sm:mx-2 text-white/60 hidden sm:inline">•</span>
+                <span className="text-[9px] sm:text-[11px] md:text-xs text-white/90">
+                  <span className="sm:hidden">{currentMessage.mobileDescription}</span>
+                  <span className="hidden sm:inline">{currentMessage.description}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <div className="flex items-center shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 sm:h-7 sm:w-7 p-0 hover:bg-white/20 text-white shrink-0"
+                aria-label="Close banner"
+                onClick={() => setIsVisible(false)}
+              >
+                <X className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              </Button>
             </div>
           </div>
+
+          {/* Progress Indicators - Hidden */}
+          <div className="hidden">
+            {messages.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setIsTransitioning(true);
+                  setTimeout(() => {
+                    setCurrentIndex(idx);
+                    setIsTransitioning(false);
+                  }, 300);
+                }}
+                className={`h-0.5 sm:h-1 rounded-full transition-all duration-300 ${
+                  idx === currentIndex 
+                    ? 'w-6 sm:w-8 bg-white' 
+                    : 'w-1.5 sm:w-2 bg-white/40 hover:bg-white/60'
+                }`}
+                aria-label={`Go to message ${idx + 1}`}
+              />
+            ))}
+          </div>
         </div>
-        <Button
-          variant="ghost"
-          className="group pointer-events-auto -my-1.5 -me-2 size-8 shrink-0 p-0 hover:bg-transparent hover:text-foreground"
-          aria-label="Close banner"
-          onClick={() => setIsVisible(false)}
-        >
-          <X className="h-4 w-4 opacity-60 transition-opacity group-hover:opacity-100" />
-        </Button>
       </div>
     </div>
   );

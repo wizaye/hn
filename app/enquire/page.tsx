@@ -3,21 +3,16 @@
 import { useState, useMemo } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
 import { products } from "@/lib/data";
-import { EnquiryCartProvider } from "@/hooks/use-enquiry-cart";
-import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import Link from "next/link";
 import { ShoppingCart, Edit } from "lucide-react";
-import { EnquiryCart, CartOpenProvider, useCartOpen } from "@/components/products/EnquiryCart";
+import { EnquiryCart, useCartOpen } from "@/components/products/EnquiryCart";
 
 function GeneralEnquiryForm() {
   const [formData, setFormData] = useState({
@@ -124,17 +119,6 @@ function DetailedProductEnquiryForm() {
     additionalMessage: "",
   });
 
-  const groupedItems = useMemo(() => {
-    const grouped: Record<string, typeof items> = {};
-    items.forEach((item) => {
-      if (!grouped[item.productId]) {
-        grouped[item.productId] = [];
-      }
-      grouped[item.productId].push(item);
-    });
-    return grouped;
-  }, [items]);
-
   const totalValue = useMemo(() => {
     return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }, [items]);
@@ -227,61 +211,56 @@ function DetailedProductEnquiryForm() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
-              {Object.entries(groupedItems).map(([productId, productItems]) => {
-                const product = products.find((p) => p.id === productId);
-                return (
-                  <div key={productId} className="rounded-lg border p-4 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-semibold">{product?.name || "Product"}</h4>
-                        {product?.modelNumber && (
-                          <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                            {product.modelNumber}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      {productItems.map((item, idx) => {
-                        const variant = product?.variants.find((v) => v.id === item.variantId);
-                        return (
-                          <div
-                            key={`${item.productId}-${item.variantId}-${idx}`}
-                            className="flex items-center justify-between py-2 border-b last:border-0"
-                          >
-                            <div className="flex items-center gap-3">
-                              {variant?.color && (
-                                <div
-                                  className="h-4 w-4 rounded-full border"
-                                  style={{
-                                    backgroundColor: variant.colorCode || "#000",
-                                  }}
-                                />
-                              )}
-                              <div>
-                                <div className="text-sm font-medium">{item.variantName}</div>
-                                <div className="text-xs text-muted-foreground">
-                                  Quantity: {item.quantity} × ${item.price}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="font-semibold">
-                              ${(item.quantity * item.price).toFixed(2)}
-                            </div>
+            <div className="rounded-lg border overflow-hidden">
+              {/* Invoice-style table */}
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50">
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 font-medium">Product</th>
+                    <th className="text-left py-3 px-4 font-medium hidden sm:table-cell">Variant</th>
+                    <th className="text-center py-3 px-4 font-medium">Qty</th>
+                    <th className="text-right py-3 px-4 font-medium">Price</th>
+                    <th className="text-right py-3 px-4 font-medium">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {items.map((item, idx) => {
+                    const product = products.find((p) => p.id === item.productId);
+                    const variant = product?.variants.find((v) => v.id === item.variantId);
+                    return (
+                      <tr key={`${item.productId}-${item.variantId}-${idx}`} className="hover:bg-muted/30">
+                        <td className="py-3 px-4">
+                          <div className="font-medium">{product?.name || "Product"}</div>
+                          <div className="text-xs text-muted-foreground sm:hidden">{item.variantName}</div>
+                          {product?.modelNumber && (
+                            <div className="text-xs text-muted-foreground font-mono">{product.modelNumber}</div>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 hidden sm:table-cell">
+                          <div className="flex items-center gap-2">
+                            {variant?.color && (
+                              <div
+                                className="h-3 w-3 rounded-full border flex-shrink-0"
+                                style={{ backgroundColor: variant.colorCode || "#000" }}
+                              />
+                            )}
+                            <span>{item.variantName}</span>
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-              <div className="rounded-lg border p-4 bg-muted/30">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">Total Estimated Value:</span>
-                  <span className="font-bold text-lg">${totalValue.toFixed(2)}</span>
-                </div>
-              </div>
+                        </td>
+                        <td className="py-3 px-4 text-center">{item.quantity}</td>
+                        <td className="py-3 px-4 text-right">${item.price.toFixed(2)}</td>
+                        <td className="py-3 px-4 text-right font-medium">${(item.quantity * item.price).toFixed(2)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot className="bg-muted/30 border-t">
+                  <tr>
+                    <td colSpan={4} className="py-3 px-4 text-right font-semibold">Estimated Total:</td>
+                    <td className="py-3 px-4 text-right font-bold text-lg">${totalValue.toFixed(2)}</td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           )}
         </div>
@@ -340,30 +319,25 @@ function DetailedProductEnquiryForm() {
 
 export default function EnquirePage() {
   return (
-    <EnquiryCartProvider>
-      <CartOpenProvider>
-        <div className="min-h-screen">
-          <Navbar />
-          <main className="container mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-6 sm:mb-8">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-2">
-                  Product Enquiry
-                </h1>
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  Fill out the form below with your details and selected products
-                </p>
-              </div>
+    <div className="min-h-screen">
+      <Navbar />
+      <main className="container mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-muted-foreground tracking-tight mb-2">
+              Product <span className="text-foreground">Enquiry</span>
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Fill out the form below with your details and selected products
+            </p>
+          </div>
 
-              <DetailedProductEnquiryForm />
-            </div>
-          </main>
-          <Footer />
-          <EnquiryCart />
-          <Toaster />
+          <DetailedProductEnquiryForm />
         </div>
-      </CartOpenProvider>
-    </EnquiryCartProvider>
+      </main>
+      <Footer />
+      <EnquiryCart />
+    </div>
   );
 }
 
