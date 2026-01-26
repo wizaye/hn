@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { NoiseBackground } from "@/components/ui/noise-background";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import { Product } from "@/lib/types";
 import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
 import { AddToEnquiryModal } from "./AddToEnquiryModal";
 import { Edit, Trash2, Maximize2 } from "lucide-react";
+import { formatCurrency, getCategoryGradient } from "@/lib/product-helpers";
 
 interface ProductCardProps {
   product: Product;
@@ -44,7 +45,13 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { getProductCartItems, removeFromCart } = useEnquiryCart();
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Get unique colors from variants
   const availableColors = product.variants
@@ -60,16 +67,8 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
   // Show exact price of first variant (or minimum price)
   const displayPrice = product.variants[0]?.price || Math.min(...product.variants.map((v) => v.price));
 
-  // Generate gradient colors based on category for visual variety
-  const getGradientColors = (category: string) => {
-    const gradients: Record<string, string[]> = {
-      "wall-clocks": ["rgb(100, 150, 255)", "rgb(150, 100, 255)", "rgb(255, 150, 100)"],
-      "desk-clocks": ["rgb(255, 150, 100)", "rgb(100, 200, 255)", "rgb(255, 200, 100)"],
-      "premium-gifting": ["rgb(255, 100, 150)", "rgb(100, 150, 255)", "rgb(255, 200, 100)"],
-      "personalized": ["rgb(150, 255, 100)", "rgb(255, 150, 200)", "rgb(100, 200, 255)"],
-    };
-    return gradients[category] || gradients["premium-gifting"];
-  };
+  // Use imported gradient helper
+  const gradientColors = getCategoryGradient(product.category);
 
   const handleRemoveAll = () => {
     cartItems.forEach((item) => {
@@ -81,13 +80,13 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
     <>
       <div className="mx-auto w-full">
         <NoiseBackground
-          gradientColors={getGradientColors(product.category)}
+          gradientColors={gradientColors}
           className="h-full"
         >
           <Card>
             {/* Product Image */}
             <div className="relative h-48 sm:h-52 md:h-56 lg:h-60 w-full overflow-hidden group">
-              {product.image && product.image.includes('unsplash') && !imageError ? (
+              {product.image && !imageError ? (
                 <>
                   <img
                     src={product.image}
@@ -144,7 +143,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
                 </span>
                 <div className="text-right">
                   <div className="text-xs sm:text-sm font-semibold text-neutral-800 dark:text-neutral-200">
-                    ${displayPrice}
+                    {formatCurrency(displayPrice, 'INR')}
                   </div>
                   <div className="text-[10px] sm:text-xs text-muted-foreground">per unit</div>
                 </div>
@@ -179,7 +178,15 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
               {/* Action Button - Fixed at bottom */}
               {showAddToEnquiry && (
                 <div className="mt-auto flex-shrink-0">
-                  {isInCart ? (
+                  {!mounted ? (
+                    <Button
+                      className="w-full"
+                      size="sm"
+                      disabled
+                    >
+                      Loading...
+                    </Button>
+                  ) : isInCart ? (
                     <div className="flex gap-2">
                       <Button
                         onClick={() => setIsModalOpen(true)}

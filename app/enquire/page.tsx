@@ -107,31 +107,151 @@ function GeneralEnquiryForm() {
 }
 
 function DetailedProductEnquiryForm() {
-  const { items } = useEnquiryCart();
+  const { items, clearCart } = useEnquiryCart();
   const { setIsOpen: setCartOpen } = useCartOpen();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [redirectTimer, setRedirectTimer] = useState(5);
+  const [needsCustomization, setNeedsCustomization] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    company: "",
-    purpose: "",
-    needsCustomization: false,
-    additionalMessage: "",
+    companyName: "",
+    deliveryTimeline: "1-2 weeks",
+    customizationNotes: "",
   });
 
   const totalValue = useMemo(() => {
     return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }, [items]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) {
       toast.error("Please add products to your enquiry cart first");
       return;
     }
-    console.log("Detailed Product Enquiry:", { ...formData, items });
-    toast.success("Enquiry submitted successfully! We'll contact you soon.");
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/enquiries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          companyName: formData.companyName,
+          email: formData.email,
+          phone: formData.phone,
+          customizationNotes: needsCustomization ? formData.customizationNotes : '',
+          deliveryTimeline: formData.deliveryTimeline,
+          items: items,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Clear form and cart
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          companyName: "",
+          deliveryTimeline: "1-2 weeks",
+          customizationNotes: "",
+        });
+        clearCart();
+        setNeedsCustomization(false);
+        
+        // Show success screen
+        setShowSuccess(true);
+        
+        // Start countdown timer
+        const interval = setInterval(() => {
+          setRedirectTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(interval);
+              window.location.href = '/';
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      } else {
+        toast.error(result.error || "Failed to submit enquiry. Please try again.");
+      }
+    } catch (error) {
+      console.error('Error submitting enquiry:', error);
+      toast.error("Failed to submit enquiry. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Success screen
+  if (showSuccess) {
+    return (
+      <div className="max-w-md mx-auto">
+        <div className="rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-8 text-center space-y-6">
+          {/* Success Icon */}
+          <div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+            <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          
+          {/* Success Message */}
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-green-900 dark:text-green-100">Enquiry Submitted!</h2>
+            <p className="text-green-700 dark:text-green-300">
+              Thank you for your enquiry. We've sent a confirmation email with all the details.
+            </p>
+          </div>
+          
+          {/* Timer */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-center gap-2 text-sm text-green-600 dark:text-green-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Redirecting to home in {redirectTimer} seconds...</span>
+            </div>
+            
+            <Button
+              onClick={() => window.location.href = '/'}
+              className="w-full bg-green-600 hover:bg-green-700"
+              size="lg"
+            >
+              Go to Home Now
+            </Button>
+          </div>
+          
+          {/* What's Next */}
+          <div className="pt-4 border-t border-green-200 dark:border-green-800 text-sm text-left space-y-2">
+            <p className="font-semibold text-green-900 dark:text-green-100">What happens next?</p>
+            <ul className="space-y-1 text-green-700 dark:text-green-300">
+              <li className="flex items-start gap-2">
+                <span className="text-green-500">✓</span>
+                <span>Our team will review your enquiry within 24 hours</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-500">✓</span>
+                <span>You'll receive a detailed quotation via email</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-500">✓</span>
+                <span>We'll contact you to discuss customization details</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -174,12 +294,13 @@ function DetailedProductEnquiryForm() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="company">Company</Label>
+              <Label htmlFor="companyName">Company Name *</Label>
               <Input
-                id="company"
+                id="companyName"
+                required
                 placeholder="Your company name"
-                value={formData.company}
-                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                value={formData.companyName}
+                onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
               />
             </div>
           </div>
@@ -248,8 +369,8 @@ function DetailedProductEnquiryForm() {
                           </div>
                         </td>
                         <td className="py-3 px-4 text-center">{item.quantity}</td>
-                        <td className="py-3 px-4 text-right">${item.price.toFixed(2)}</td>
-                        <td className="py-3 px-4 text-right font-medium">${(item.quantity * item.price).toFixed(2)}</td>
+                        <td className="py-3 px-4 text-right">₹{item.price.toFixed(2)}</td>
+                        <td className="py-3 px-4 text-right font-medium">₹{(item.quantity * item.price).toFixed(2)}</td>
                       </tr>
                     );
                   })}
@@ -257,7 +378,7 @@ function DetailedProductEnquiryForm() {
                 <tfoot className="bg-muted/30 border-t">
                   <tr>
                     <td colSpan={4} className="py-3 px-4 text-right font-semibold">Estimated Total:</td>
-                    <td className="py-3 px-4 text-right font-bold text-lg">${totalValue.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-right font-bold text-lg">₹{totalValue.toFixed(2)}</td>
                   </tr>
                 </tfoot>
               </table>
@@ -266,51 +387,62 @@ function DetailedProductEnquiryForm() {
         </div>
 
         <div className="space-y-4">
+          <h3 className="text-xl font-semibold">Order Details</h3>
+          
           <div className="space-y-2">
-            <Label htmlFor="purpose">Purpose *</Label>
+            <Label htmlFor="deliveryTimeline">Delivery Timeline *</Label>
             <select
-              id="purpose"
+              id="deliveryTimeline"
               required
-              value={formData.purpose}
-              onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+              value={formData.deliveryTimeline}
+              onChange={(e) => setFormData({ ...formData, deliveryTimeline: e.target.value })}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <option value="">Select purpose</option>
-              <option value="corporate-gifting">Corporate Gifting</option>
-              <option value="bulk-order">Bulk Order</option>
-              <option value="custom-branding">Custom Branding</option>
-              <option value="retail">Retail</option>
-              <option value="other">Other</option>
+              <option value="urgent">Urgent (within 1 week)</option>
+              <option value="1-2 weeks">1-2 weeks</option>
+              <option value="2-4 weeks">2-4 weeks</option>
+              <option value="1-2 months">1-2 months</option>
+              <option value="flexible">Flexible</option>
             </select>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="needsCustomization"
-              checked={formData.needsCustomization}
-              onChange={(e) => setFormData({ ...formData, needsCustomization: e.target.checked })}
-              className="h-4 w-4 rounded border-gray-300"
-            />
-            <Label htmlFor="needsCustomization" className="cursor-pointer">
-              Do you need customization?
-            </Label>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="additionalMessage">Additional Message</Label>
-            <Textarea
-              id="additionalMessage"
-              rows={4}
-              placeholder="Any additional information or requirements..."
-              value={formData.additionalMessage}
-              onChange={(e) => setFormData({ ...formData, additionalMessage: e.target.value })}
-            />
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="needsCustomization"
+                checked={needsCustomization}
+                onChange={(e) => {
+                  setNeedsCustomization(e.target.checked);
+                  if (!e.target.checked) {
+                    setFormData({ ...formData, customizationNotes: "" });
+                  }
+                }}
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary"
+              />
+              <Label htmlFor="needsCustomization" className="font-medium cursor-pointer">
+                Is customization needed?
+              </Label>
+            </div>
+            
+            {needsCustomization && (
+              <div className="space-y-2 pl-6">
+                <Label htmlFor="customizationNotes">Customization Details *</Label>
+                <Textarea
+                  id="customizationNotes"
+                  rows={4}
+                  required={needsCustomization}
+                  placeholder="Please describe your customization requirements (logo details, special colors, text, etc.)..."
+                  value={formData.customizationNotes}
+                  onChange={(e) => setFormData({ ...formData, customizationNotes: e.target.value })}
+                />
+              </div>
+            )}
           </div>
         </div>
 
-        <Button type="submit" className="w-full" size="lg" disabled={items.length === 0}>
-          Submit Enquiry
+        <Button type="submit" className="w-full" size="lg" disabled={items.length === 0 || isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit Enquiry"}
         </Button>
       </form>
     </>
