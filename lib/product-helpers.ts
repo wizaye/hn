@@ -1,13 +1,14 @@
 // Helper to transform D1 database products to UI-compatible format
 export function transformProductFromDB(dbProduct: any, category: string): any {
   // Database schema: id, model_number, color, price, image_url, category_id
-  const modelNumber = dbProduct.model_number || `Product-${dbProduct.id}`;
+  const modelNumber = dbProduct.model || dbProduct.id?.toString() || 'N/A';
   const price = parseFloat(dbProduct.price || '0');
   const color = dbProduct.color || null;
   const imageUrl = dbProduct.image || dbProduct.image_url || null;
+  const dbId = dbProduct.id?.toString() || Math.random().toString(36).substr(2, 9);
   
   return {
-    id: dbProduct.id?.toString() || modelNumber,
+    id: dbId, // Use database ID as the unique identifier
     name: modelNumber,
     modelNumber: modelNumber,
     category: category,
@@ -19,7 +20,7 @@ export function transformProductFromDB(dbProduct: any, category: string): any {
     // Create a simple variant structure for compatibility
     variants: [
       {
-        id: 'v1',
+        id: dbId, // Use database ID for uniqueness
         name: color || 'Standard',
         price: price,
         color: color,
@@ -84,4 +85,37 @@ export function formatCurrency(amount: number | string, currency: 'INR' | 'USD' 
   } else {
     return `$${numAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
+}
+
+// Helper to group products by model number
+export function groupProductsByModel(products: any[]): any[] {
+  const groupedMap = new Map<string, any>();
+  let counter = 0;
+  
+  products.forEach((product) => {
+    const modelNumber = product.modelNumber;
+    
+    if (!groupedMap.has(modelNumber)) {
+      // First product with this model number - create the grouped product
+      counter++;
+      groupedMap.set(modelNumber, {
+        ...product,
+        // Store all variants with their images
+        images: [{ url: product.image, color: product.color, variantId: product.variants[0]?.id || product.id }],
+        allVariants: [...product.variants], // Clone the array
+        // Use unique counter-based ID for React mapping
+        primaryId: `grouped-${counter}-${Date.now()}`,
+        // Keep the model number as the display ID
+        id: modelNumber,
+      });
+    } else {
+      // Add this variant's image and merge variants
+      const existing = groupedMap.get(modelNumber)!;
+      existing.images.push({ url: product.image, color: product.color, variantId: product.variants[0]?.id || product.id });
+      // Merge variants with unique IDs
+      existing.allVariants = [...existing.allVariants, ...product.variants];
+    }
+  });
+  
+  return Array.from(groupedMap.values());
 }

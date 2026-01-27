@@ -34,18 +34,19 @@ const contactInfo = [
     icon: Phone,
     title: "Contact Us",
     details: [
-      { label: "Phone", value: "+91 40 1234 5678" },
+      { label: "Phone", value: "+91-7893002716" },
       { label: "Email", value: "sales@hyderabadnetworks.com" },
     ],
     description: "We're available Mon-Sat, 9am-7pm. Email responses within 24hrs.",
-    href: "tel:+914012345678",
+    href: "tel:+917893002716",
   },
   {
     icon: MapPin,
     title: "Visit Our Showroom",
     details: [
-      { label: null, value: "Hyderabad Network, Secunderabad" },
-      { label: null, value: "Hyderabad, Telangana" },
+      { label: null, value: "Shop No. 4-1, old Big Bazar Car Parking" },
+      { label: null, value: "Back Side SMART Bazar, 834/A, Lane" },
+      { label: null, value: "Abids, Hyderabad, Telangana 500001" },
     ],
     description: "Authorised Distributor for Ajanta & Orpat Group",
     href: "https://maps.google.com/maps?q=Hyderabad+Network+(Authorised+Distributor+for+Ajanta+%26+Orpat+Group)",
@@ -55,7 +56,7 @@ const contactInfo = [
     title: "Business Hours",
     details: [
       { label: null, value: "Mon-Sat: 9:00 AM - 7:00 PM" },
-      { label: null, value: "Sunday: Closed" },
+      { label: null, value: "Sunday: 12:00 PM - 6:00 PM" },
     ],
     description: "Visit us during these hours for the best service.",
   },
@@ -69,7 +70,7 @@ const socialLinks = [
   },
   {
     icon: InstagramIcon,
-    href: "#",
+    href: "https://www.instagram.com/hyderabad_network?igsh=eDlnbzlmNmN4Y3Fw",
     label: "Instagram",
   },
   {

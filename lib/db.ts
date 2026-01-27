@@ -77,11 +77,11 @@ export async function getCategories(): Promise<Array<{ category: string }>> {
  * Get products from a specific category table
  */
 export async function getProductsByCategory(categoryName: string) {
-  // Sanitize table name to prevent SQL injection
-  const sanitizedCategory = categoryName.replace(/[^a-zA-Z0-9_]/g, '_');
+  // Convert category name to table name: lowercase and replace spaces with underscores
+  const tableName = categoryName.toLowerCase().replace(/\s+/g, '_');
   
   try {
-    const products = await queryD1(`SELECT * FROM ${sanitizedCategory}`);
+    const products = await queryD1(`SELECT * FROM ${tableName}`);
     
     // Transform products to include image URLs from R2
     return products.map((product: any) => ({
@@ -91,6 +91,8 @@ export async function getProductsByCategory(categoryName: string) {
         ? `${R2_PUBLIC_URL}/${product.image_path}` 
         : null),
       category: categoryName,
+      // Use model_number as unique identifier instead of id
+      id: product.model || product.id,
     }));
   } catch (error) {
     console.error(`Error fetching products from category ${categoryName}:`, error);
@@ -128,11 +130,12 @@ export async function getAllProducts() {
  * Get a single product by ID from a specific category
  */
 export async function getProductById(categoryName: string, productId: string) {
-  const sanitizedCategory = categoryName.replace(/[^a-zA-Z0-9_]/g, '_');
+  // Convert category name to table name: lowercase and replace spaces with underscores
+  const tableName = categoryName.toLowerCase().replace(/\s+/g, '_');
   
   try {
     const products = await queryD1(
-      `SELECT * FROM ${sanitizedCategory} WHERE id = ? OR model_number = ? LIMIT 1`,
+      `SELECT * FROM ${tableName} WHERE id = ? OR model_number = ? LIMIT 1`,
       [productId, productId]
     );
     
@@ -148,6 +151,8 @@ export async function getProductById(categoryName: string, productId: string) {
         ? `${R2_PUBLIC_URL}/${product.image_path}` 
         : null),
       category: categoryName,
+      // Use model_number as primary identifier
+      id: product.model_number || product.id,
     };
   } catch (error) {
     console.error(`Error fetching product ${productId} from ${categoryName}:`, error);

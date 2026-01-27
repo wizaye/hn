@@ -25,7 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/products/ProductCard";
 import { EnquiryCart } from "@/components/products/EnquiryCart";
 import { Product } from "@/lib/types";
-import { transformProductFromDB, getCategoryDisplayName } from "@/lib/product-helpers";
+import { transformProductFromDB, getCategoryDisplayName, groupProductsByModel } from "@/lib/product-helpers";
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -76,7 +76,9 @@ function ProductsContent() {
           const transformedProducts = data.data.map((p: any) => 
             transformProductFromDB(p, p.category || selectedCategory)
           );
-          setProducts(transformedProducts);
+          // Group products by model number
+          const groupedProducts = groupProductsByModel(transformedProducts);
+          setProducts(groupedProducts);
         } else {
           setError(data.error || 'Failed to fetch products');
         }
@@ -160,7 +162,26 @@ function ProductsContent() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <main className="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">          {/* Error Message */}
+      
+      {/* Category Banner */}
+      <div className="relative h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=1200&h=400&fit=crop')] bg-cover bg-center opacity-20" />
+        <div className="relative container mx-auto px-4 sm:px-6 md:px-8 h-full flex flex-col justify-center items-center text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4">
+            {selectedCategory === 'all' 
+              ? 'All Products' 
+              : getCategoryDisplayName(selectedCategory)}
+          </h1>
+          <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-2xl">
+            {selectedCategory === 'all'
+              ? 'Discover our complete collection of premium clocks for corporate gifting'
+              : `Explore our ${getCategoryDisplayName(selectedCategory).toLowerCase()} collection`}
+          </p>
+        </div>
+      </div>
+
+      <main className="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">{/* Error Message */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-red-800 dark:text-red-200">{error}</p>
@@ -228,7 +249,7 @@ function ProductsContent() {
             <>
               <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {paginatedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} showAddToEnquiry />
+                  <ProductCard key={product.primaryId || product.id} product={product} showAddToEnquiry />
                 ))}
               </div>
 
