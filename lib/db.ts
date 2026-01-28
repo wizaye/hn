@@ -84,16 +84,25 @@ export async function getProductsByCategory(categoryName: string) {
     const products = await queryD1(`SELECT * FROM ${tableName}`);
     
     // Transform products to include image URLs from R2
-    return products.map((product: any) => ({
-      ...product,
-      // Handle both image_url (from upload script) and image_path (legacy)
-      image: product.image_url || (product.image_path 
-        ? `${R2_PUBLIC_URL}/${product.image_path}` 
-        : null),
-      category: categoryName,
-      // Use model_number as unique identifier instead of id
-      id: product.model || product.id,
-    }));
+    return products.map((product: any) => {
+      const model = product.model || product.id;
+      const color = product.color || '';
+      // Create unique ID by combining model and color (for products with same model but different colors)
+      const uniqueId = color ? `${model}-${color.replace(/\s+/g, '-')}` : model;
+      
+      return {
+        ...product,
+        // Handle both image_url (from upload script) and image_path (legacy)
+        image: product.image_url || (product.image_path 
+          ? `${R2_PUBLIC_URL}/${product.image_path}` 
+          : null),
+        category: categoryName,
+        // Use unique ID that includes color to avoid duplicate keys
+        id: uniqueId,
+        // Keep original model number for display
+        model: model,
+      };
+    });
   } catch (error) {
     console.error(`Error fetching products from category ${categoryName}:`, error);
     throw error;

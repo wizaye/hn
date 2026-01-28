@@ -87,12 +87,20 @@ export async function POST(request: Request) {
 
     // Send emails (only if RESEND_API_KEY is configured)
     let emailsSent = false;
+    let customerEmailSent = false;
+    let adminEmailSent = false;
+    
     if (RESEND_API_KEY) {
       try {
         const { getCustomerConfirmationEmail, getAdminNotificationEmail } = await import('@/lib/email-templates');
         
         const customerEmail = getCustomerConfirmationEmail(data);
         const adminEmail = getAdminNotificationEmail(data, enquiryId);
+        
+        console.log(`Sending emails for enquiry #${enquiryId}`);
+        console.log(`Customer email: ${data.email}`);
+        console.log(`Admin email: ${ADMIN_EMAIL}`);
+        console.log(`From email: ${FROM_EMAIL}`);
         
         // Send customer confirmation email
         const customerEmailResponse = await fetch('https://api.resend.com/emails', {
@@ -109,8 +117,16 @@ export async function POST(request: Request) {
             text: customerEmail.text,
           }),
         });
+        
+        customerEmailSent = customerEmailResponse.ok;
+        if (customerEmailSent) {
+          console.log('✅ Customer confirmation email sent successfully');
+        } else {
+          const customerError = await customerEmailResponse.text();
+          console.error('❌ Customer email failed:', customerError);
+        }
 
-        // Send admin notification email
+        // Send admin notification email to Hyderabad Networks
         const adminEmailResponse = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -126,19 +142,21 @@ export async function POST(request: Request) {
           }),
         });
 
-        emailsSent = customerEmailResponse.ok && adminEmailResponse.ok;
-        
-        if (!emailsSent) {
-          const customerError = customerEmailResponse.ok ? null : await customerEmailResponse.text();
-          const adminError = adminEmailResponse.ok ? null : await adminEmailResponse.text();
-          console.warn('Failed to send some emails, but enquiry was saved');
-          console.error('Customer email error:', customerError);
-          console.error('Admin email error:', adminError);
+        adminEmailSent = adminEmailResponse.ok;
+        if (adminEmailSent) {
+          console.log('✅ Admin notification email sent successfully to:', ADMIN_EMAIL);
+        } else {
+          const adminError = await adminEmailResponse.text();
+          console.error('❌ Admin email failed:', adminError);
         }
+        
+        emailsSent = customerEmailSent && adminEmailSent;
       } catch (emailError) {
         console.error('Error sending emails:', emailError);
         // Don't fail the entire request if email fails
       }
+    } else {
+      console.warn('RESEND_API_KEY not configured, skipping email notifications');
     }
 
     return NextResponse.json({
@@ -146,6 +164,11 @@ export async function POST(request: Request) {
       message: 'Enquiry submitted successfully',
       enquiryId,
       emailsSent,
+      emailDetails: {
+        customerEmailSent,
+        adminEmailSent,
+        adminEmail: ADMIN_EMAIL,
+      },
       data: {
         id: enquiryId,
         customerName: data.name,

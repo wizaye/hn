@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { transformProductFromDB } from "@/lib/product-helpers";
+import { transformProductFromDB, groupProductsByModel } from "@/lib/product-helpers";
 
 export function BestSellers() {
   const [products, setProducts] = useState<any[]>([]);
@@ -18,11 +18,15 @@ export function BestSellers() {
         const data = await response.json();
         
         if (data.success) {
-          // Transform and take first 8 products as best sellers
+          // Transform products
           const transformedProducts = data.data
-            .slice(0, 8)
             .map((p: any) => transformProductFromDB(p, p.category));
-          setProducts(transformedProducts);
+          
+          // Group by model number so same models with different colors show as one card
+          const groupedProducts = groupProductsByModel(transformedProducts);
+          
+          // Take first 8 grouped products as best sellers
+          setProducts(groupedProducts.slice(0, 8));
         }
       } catch (error) {
         console.error('Error fetching best sellers:', error);

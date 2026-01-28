@@ -5,10 +5,13 @@ export function transformProductFromDB(dbProduct: any, category: string): any {
   const price = parseFloat(dbProduct.price || '0');
   const color = dbProduct.color || null;
   const imageUrl = dbProduct.image || dbProduct.image_url || null;
-  const dbId = dbProduct.id?.toString() || Math.random().toString(36).substr(2, 9);
+  // Create unique ID by combining model number and color
+  const uniqueId = color 
+    ? `${modelNumber}-${color.replace(/\s+/g, '-')}`
+    : dbProduct.id?.toString() || Math.random().toString(36).substr(2, 9);
   
   return {
-    id: dbId, // Use database ID as the unique identifier
+    id: uniqueId, // Use unique ID that includes color
     name: modelNumber,
     modelNumber: modelNumber,
     category: category,
@@ -20,7 +23,7 @@ export function transformProductFromDB(dbProduct: any, category: string): any {
     // Create a simple variant structure for compatibility
     variants: [
       {
-        id: dbId, // Use database ID for uniqueness
+        id: uniqueId, // Use unique ID that includes color
         name: color || 'Standard',
         price: price,
         color: color,
@@ -98,15 +101,19 @@ export function groupProductsByModel(products: any[]): any[] {
     if (!groupedMap.has(modelNumber)) {
       // First product with this model number - create the grouped product
       counter++;
+      // Create unique ID by appending first color to model number
+      const uniqueId = product.color 
+        ? `${modelNumber}-${product.color.replace(/\s+/g, '-')}`
+        : modelNumber;
+      
       groupedMap.set(modelNumber, {
         ...product,
         // Store all variants with their images
         images: [{ url: product.image, color: product.color, variantId: product.variants[0]?.id || product.id }],
         allVariants: [...product.variants], // Clone the array
-        // Use unique counter-based ID for React mapping
-        primaryId: `grouped-${counter}-${Date.now()}`,
-        // Keep the model number as the display ID
-        id: modelNumber,
+        // Use unique ID that includes color for React mapping
+        id: uniqueId,
+        modelNumber: modelNumber, // Keep original model number
       });
     } else {
       // Add this variant's image and merge variants
