@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { NoiseBackground } from "@/components/ui/noise-background";
 import { Badge } from "@/components/ui/badge";
@@ -10,11 +10,13 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Product } from "@/lib/types";
 import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
 import { AddToEnquiryModal } from "./AddToEnquiryModal";
-import { Edit, Trash2, Maximize2 } from "lucide-react";
+import { Edit, Trash2, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
+import { formatCurrency, getCategoryGradient } from "@/lib/product-helpers";
 
 interface ProductCardProps {
   product: Product;
@@ -44,15 +46,38 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { getProductCartItems, removeFromCart } = useEnquiryCart();
 
-  // Get unique colors from variants
-  const availableColors = product.variants
-    .filter((v) => v.color)
-    .map((v) => ({
-      name: v.color!,
-      code: v.colorCode || "#000000",
-    }));
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Handle grouped products with multiple images
+  const images = (product as any).images || [{ url: product.image, color: (product as any).color, variantId: product.id }];
+  const currentImage = images[currentImageIndex];
+
+  // Get unique colors from all variants (for grouped products)
+  const allVariants = (product as any).allVariants || product.variants;
+  const availableColors = Array.from(
+    new Map(
+      allVariants
+        .filter((v: any) => v.color)
+        .map((v: any) => [v.color, { name: v.color!, code: v.colorCode || "#000000" }])
+    ).values()
+  );
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
 
   // Get all variants in cart for this product
   const cartItems = getProductCartItems(product.id);
@@ -60,16 +85,8 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
   // Show exact price of first variant (or minimum price)
   const displayPrice = product.variants[0]?.price || Math.min(...product.variants.map((v) => v.price));
 
-  // Generate gradient colors based on category for visual variety
-  const getGradientColors = (category: string) => {
-    const gradients: Record<string, string[]> = {
-      "wall-clocks": ["rgb(100, 150, 255)", "rgb(150, 100, 255)", "rgb(255, 150, 100)"],
-      "desk-clocks": ["rgb(255, 150, 100)", "rgb(100, 200, 255)", "rgb(255, 200, 100)"],
-      "premium-gifting": ["rgb(255, 100, 150)", "rgb(100, 150, 255)", "rgb(255, 200, 100)"],
-      "personalized": ["rgb(150, 255, 100)", "rgb(255, 150, 200)", "rgb(100, 200, 255)"],
-    };
-    return gradients[category] || gradients["premium-gifting"];
-  };
+  // Use imported gradient helper
+  const gradientColors = getCategoryGradient(product.category);
 
   const handleRemoveAll = () => {
     cartItems.forEach((item) => {
@@ -81,21 +98,57 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
     <>
       <div className="mx-auto w-full">
         <NoiseBackground
-          gradientColors={getGradientColors(product.category)}
+          gradientColors={gradientColors}
           className="h-full"
         >
           <Card>
-            {/* Product Image */}
+            {/* Product Image with Carousel */}
             <div className="relative h-48 sm:h-52 md:h-56 lg:h-60 w-full overflow-hidden group">
-              {product.image && product.image.includes('unsplash') && !imageError ? (
+              {currentImage.url && !imageError ? (
                 <>
                   <img
-                    src={product.image}
-                    alt={product.name}
+                    src={currentImage.url}
+                    alt={`${product.name} - ${currentImage.color || ''}`}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     onError={() => setImageError(true)}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  
+                  {/* Image Navigation Buttons */}
+                  {images.length > 1 && (
+                    <>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/90 hover:bg-white text-black opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        onClick={handlePrevImage}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/90 hover:bg-white text-black opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        onClick={handleNextImage}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                      {/* Image Indicator */}
+                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                        {images.map((_: any, idx: number) => (
+                          <div
+                            key={idx}
+                            className={cn(
+                              "h-1.5 w-1.5 rounded-full transition-all",
+                              idx === currentImageIndex
+                                ? "bg-white w-4"
+                                : "bg-white/50"
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
                   
                   {/* Hover Overlay with Enlarge Button */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -111,15 +164,18 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-4xl w-[90vw] p-2">
+                        <DialogTitle className="sr-only">
+                          {product.name} {currentImage.color && `- ${currentImage.color}`}
+                        </DialogTitle>
                         <div className="relative w-full aspect-square">
                           <img
-                            src={product.image}
-                            alt={product.name}
+                            src={currentImage.url}
+                            alt={`${product.name} - ${currentImage.color || ''}`}
                             className="w-full h-full object-contain rounded-lg"
                           />
                         </div>
                         <div className="text-center mt-4">
-                          <h3 className="text-lg font-semibold">{product.name}</h3>
+                          <h3 className="text-lg font-semibold">{product.name} {currentImage.color && `- ${currentImage.color}`}</h3>
                           <p className="text-sm text-muted-foreground">{product.description}</p>
                         </div>
                       </DialogContent>
@@ -144,7 +200,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
                 </span>
                 <div className="text-right">
                   <div className="text-xs sm:text-sm font-semibold text-neutral-800 dark:text-neutral-200">
-                    ${displayPrice}
+                    {formatCurrency(displayPrice, 'INR')}
                   </div>
                   <div className="text-[10px] sm:text-xs text-muted-foreground">per unit</div>
                 </div>
@@ -158,7 +214,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
                   </Label>
                   <div className="max-h-16 sm:max-h-20 overflow-y-auto">
                     <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                      {availableColors.map((color, idx) => (
+                      {availableColors.map((color: any, idx: number) => (
                         <Badge
                           key={idx}
                           variant="outline"
@@ -179,7 +235,15 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
               {/* Action Button - Fixed at bottom */}
               {showAddToEnquiry && (
                 <div className="mt-auto flex-shrink-0">
-                  {isInCart ? (
+                  {!mounted ? (
+                    <Button
+                      className="w-full"
+                      size="sm"
+                      disabled
+                    >
+                      Loading...
+                    </Button>
+                  ) : isInCart ? (
                     <div className="flex gap-2">
                       <Button
                         onClick={() => setIsModalOpen(true)}

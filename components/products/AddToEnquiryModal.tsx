@@ -23,6 +23,7 @@ import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
 import { Loader2, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import { formatCurrency } from "@/lib/product-helpers";
 
 interface AddToEnquiryModalProps {
   product: Product;
@@ -36,8 +37,12 @@ export function AddToEnquiryModal({
   onOpenChange,
 }: AddToEnquiryModalProps) {
   const { addToCart, getCartItem, updateCartItem, getProductCartItems, removeFromCart } = useEnquiryCart();
+  
+  // Get all variants from grouped products - each database row is a unique variant
+  const allVariants = (product as any).allVariants || product.variants;
+  
   const [selectedVariant, setSelectedVariant] = useState(
-    product.variants[0]?.id || ""
+    allVariants[0]?.id || ""
   );
   const [quantity, setQuantity] = useState<string>("1");
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +67,7 @@ export function AddToEnquiryModal({
         updates.quantity = existingItem.quantity.toString();
       }
     } else {
-      updates.variant = product.variants[0]?.id || "";
+      updates.variant = allVariants[0]?.id || "";
       const existingItem = getCartItem(product.id, updates.variant);
       if (existingItem) {
         updates.quantity = existingItem.quantity.toString();
@@ -72,10 +77,10 @@ export function AddToEnquiryModal({
     // Batch updates
     setSelectedVariant(updates.variant);
     setQuantity(updates.quantity);
-  }, [open, editingVariantId, product.id, product.variants, getCartItem]);
+  }, [open, editingVariantId, product.id, allVariants, getCartItem]);
 
   const handleUpdateCart = async () => {
-    const variant = product.variants.find((v) => v.id === selectedVariant);
+    const variant = allVariants.find((v) => v.id === selectedVariant);
     if (!variant) return;
 
     const quantityNum = parseInt(quantity) || 1;
@@ -131,7 +136,7 @@ export function AddToEnquiryModal({
     toast.success("Variant removed from enquiry list");
   };
 
-  const selectedVariantData = product.variants.find((v) => v.id === selectedVariant);
+  const selectedVariantData = allVariants.find((v) => v.id === selectedVariant);
   const existingItem = getCartItem(product.id, selectedVariant);
   const isEditing = !!existingItem || !!editingVariantId;
   const hasAnyVariantInCart = cartItems.length > 0;
@@ -153,7 +158,7 @@ export function AddToEnquiryModal({
                 <Label>Current Variants in Enquiry List</Label>
                 <div className="rounded-lg border divide-y">
                   {cartItems.map((item) => {
-                    const variant = product.variants.find((v) => v.id === item.variantId);
+                    const variant = allVariants.find((v) => v.id === item.variantId);
                     return (
                       <div
                         key={item.variantId}
@@ -171,7 +176,7 @@ export function AddToEnquiryModal({
                           <div>
                             <div className="text-sm font-medium">{item.variantName}</div>
                             <div className="text-xs text-muted-foreground">
-                              Quantity: {item.quantity} × ${item.price} = ${(item.quantity * item.price).toFixed(2)}
+                              Quantity: {item.quantity} × {formatCurrency(item.price, 'INR')} = {formatCurrency(item.quantity * item.price, 'INR')}
                             </div>
                           </div>
                         </div>
@@ -216,21 +221,9 @@ export function AddToEnquiryModal({
                   <SelectValue placeholder="Select variant" />
                 </SelectTrigger>
                 <SelectContent>
-                  {product.variants.map((variant) => (
+                  {allVariants.map((variant) => (
                     <SelectItem key={variant.id} value={variant.id}>
-                      <div className="flex items-center gap-2">
-                        {variant.color && (
-                          <div
-                            className="h-4 w-4 rounded-full border"
-                            style={{
-                              backgroundColor: variant.colorCode || "#000",
-                            }}
-                          />
-                        )}
-                        <span>
-                          {variant.name} - ${variant.price}
-                        </span>
-                      </div>
+                      {variant.color ? `${variant.color} - ${formatCurrency(variant.price, 'INR')}` : `${variant.name} - ${formatCurrency(variant.price, 'INR')}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -265,12 +258,12 @@ export function AddToEnquiryModal({
                 <div className="text-sm space-y-1">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Price per unit:</span>
-                    <span className="font-medium">${selectedVariantData.price}</span>
+                    <span className="font-medium">{formatCurrency(selectedVariantData.price, 'INR')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total:</span>
                     <span className="font-semibold">
-                      ${(selectedVariantData.price * (parseInt(quantity) || 1)).toFixed(2)}
+                      {formatCurrency(selectedVariantData.price * (parseInt(quantity) || 1), 'INR')}
                     </span>
                   </div>
                 </div>

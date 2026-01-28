@@ -6,8 +6,6 @@ const images = [
   "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800&h=600&fit=crop",
   "https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=800&h=600&fit=crop",
   "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1495364141860-b0d03eccd065?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1577201227227-b275785d8ee4?w=800&h=600&fit=crop",
 ];
 
 export function About() {
@@ -18,31 +16,26 @@ export function About() {
           {/* Left Column - Text */}
           <div className="flex flex-col justify-center space-y-4 sm:space-y-6">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-muted-foreground tracking-tight">
-              About <span className="text-foreground">Hyderabad Networks</span>
+              About <span className="text-foreground">Hyderabad Network</span>
             </h2>
             <div className="space-y-3 sm:space-y-4 text-sm sm:text-base md:text-lg text-muted-foreground">
               <p className="text-justify">
-                We specialize in premium corporate clock solutions for bulk
-                gifting programs. With years of experience in manufacturing and
-                customization, we help enterprises create memorable branded
-                experiences.
+                Hyderabad Network began in 1953, when our father, Mohammed Osman, founded the Record Watch Company at M.J. Market, Hyderabad. What started as a small luxury shop soon became a trusted name for quality wall clocks and wristwatches.
               </p>
               <p className="text-justify">
-                Our expertise includes bulk manufacturing, custom branding,
-                laser engraving, logo printing, and personalized packaging. We
-                work with businesses of all sizes to deliver high-quality clock
-                solutions that reflect your brand identity.
+                In 1999, we expanded our legacy by becoming distributors for the renowned Ajanta Group. Over the years, our presence at the Nampally Exhibition has earned us multiple awards, including Best Stall for more than a decade.
               </p>
               <p className="text-justify">
-                Trusted by leading corporations, we understand the
-                importance of quality, timely delivery, and exceptional
-                customer service in B2B relationships.
+                Today, we've grown beyond clocks and watches into corporate gifting solutions for businesses and institutions across South India. From Abids, Hyderabad, we continue to serve with the same values of trust, authenticity, and lasting relationships.
+              </p>
+              <p className="text-justify font-semibold text-foreground">
+                Hyderabad Network - A heritage of trust, evolving with time.
               </p>
             </div>
           </div>
 
           {/* Right Column - Autoplay Carousel */}
-          <div className="relative h-[250px] sm:h-[300px] lg:h-[350px] xl:h-[400px] rounded-lg overflow-hidden border">
+          <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] rounded-lg overflow-hidden border">
             <FramerCarousel images={images} autoplayInterval={4000} className="w-full h-full" />
           </div>
         </div>

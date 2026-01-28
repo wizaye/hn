@@ -1,8 +1,19 @@
 "use client";
 
 import { useState, useMemo, createContext, useContext, ReactNode, useEffect } from "react";
-import { ShoppingCart, Trash2, ArrowUp } from "lucide-react";
+import { ShoppingCart, Trash2, ArrowUp, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Drawer,
   DrawerContent,
@@ -62,12 +73,22 @@ interface EnquiryCartProps {
 }
 
 export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps = {}) {
-  const { items, removeFromCart, updateCartItem, totalItems, uniqueProductsCount } = useEnquiryCart();
+  const { items, removeFromCart, updateCartItem, clearCart, totalItems, uniqueProductsCount } = useEnquiryCart();
   const cartContext = useCartOpen();
   const [internalOpen, setInternalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const isMobile = useIsMobile();
   const pathname = usePathname();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [deletingItem, setDeletingItem] = useState<{productId: string, variantId: string} | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
+  const [showClearDialog, setShowClearDialog] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<{productId: string, variantId: string} | null>(null);
+
+  // Prevent hydration mismatch by only rendering cart content after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // Check if we're on the products page
   const isProductsPage = pathname === "/products" || pathname.startsWith("/products");
@@ -140,6 +161,30 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
       return editingQuantities[key];
     }
     return currentQty.toString();
+  };
+
+  const handleDeleteItem = async (productId: string, variantId: string) => {
+    setDeletingItem({productId, variantId});
+    try {
+      // Simulate a brief delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 300));
+      removeFromCart(productId, variantId);
+    } finally {
+      setDeletingItem(null);
+      setPendingDelete(null);
+    }
+  };
+
+  const handleClearCart = async () => {
+    setIsClearing(true);
+    try {
+      // Simulate a brief delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 300));
+      clearCart();
+    } finally {
+      setIsClearing(false);
+      setShowClearDialog(false);
+    }
   };
 
   return (
@@ -252,7 +297,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                                 <div className="flex-1 min-w-0">
                                   <div className="font-medium text-sm">{item.variantName}</div>
                                   <div className="text-xs text-muted-foreground">
-                                    ${item.price}/unit
+                                    ₹{item.price}/unit
                                   </div>
                                 </div>
 
@@ -276,17 +321,22 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
 
                                 {/* Total */}
                                 <div className="text-right min-w-[70px]">
-                                  <div className="font-semibold text-sm">${itemTotal.toFixed(2)}</div>
+                                  <div className="font-semibold text-sm">₹{itemTotal.toFixed(2)}</div>
                                 </div>
 
                                 {/* Remove Button */}
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => removeFromCart(item.productId, item.variantId)}
+                                  onClick={() => setPendingDelete({productId: item.productId, variantId: item.variantId})}
+                                  disabled={deletingItem?.productId === item.productId && deletingItem?.variantId === item.variantId}
                                   className="h-8 w-8 text-muted-foreground hover:text-destructive flex-shrink-0"
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  {deletingItem?.productId === item.productId && deletingItem?.variantId === item.variantId ? (
+                                    <Spinner size="sm" className="text-muted-foreground" />
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
                                 </Button>
                               </div>
                             </div>
@@ -314,24 +364,102 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                   </div>
                   <div className="flex items-center justify-between text-base pt-2 border-t">
                     <span className="font-semibold">Estimated Value:</span>
-                    <span className="font-bold text-lg">${totalValue.toFixed(2)}</span>
+                    <span className="font-bold text-lg">₹{totalValue.toFixed(2)}</span>
                   </div>
                 </div>
-                <Button
-                  asChild
-                  className="w-full rounded-xl"
-                  size="lg"
-                >
-                  <Link href="/enquire" onClick={() => setIsOpen(false)}>
-                    Fill in Details and Submit Enquiry
-                  </Link>
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    asChild
+                    className="w-full rounded-xl"
+                    size="lg"
+                  >
+                    <Link href="/enquire" onClick={() => setIsOpen(false)}>
+                      Fill in Details and Submit Enquiry
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={() => setShowClearDialog(true)}
+                    disabled={isClearing}
+                  >
+                    {isClearing ? (
+                      <>
+                        <Spinner size="sm" className="mr-2" />
+                        Clearing Cart...
+                      </>
+                    ) : (
+                      <>
+                        <Trash className="h-4 w-4 mr-2" />
+                        Clear Cart
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </>
           )}
         </DrawerContent>
       </Drawer>
       )}
+      
+      {/* Delete Item Confirmation Dialog */}
+      <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove this item from your enquiry cart? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingItem !== null}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => pendingDelete && handleDeleteItem(pendingDelete.productId, pendingDelete.variantId)}
+              disabled={deletingItem !== null}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {deletingItem ? (
+                <>
+                  <Spinner size="sm" className="mr-2" />
+                  Removing...
+                </>
+              ) : (
+                "Remove"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Clear Cart Confirmation Dialog */}
+      <AlertDialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear Entire Cart?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove all {items.length} item{items.length !== 1 ? 's' : ''} from your cart? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isClearing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleClearCart}
+              disabled={isClearing}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isClearing ? (
+                <>
+                  <Spinner size="sm" className="mr-2" />
+                  Clearing...
+                </>
+              ) : (
+                "Clear Cart"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

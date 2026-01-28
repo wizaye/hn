@@ -24,8 +24,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/products/ProductCard";
 import { EnquiryCart } from "@/components/products/EnquiryCart";
-import { products } from "@/lib/data";
 import { Product } from "@/lib/types";
+import { transformProductFromDB, getCategoryDisplayName, groupProductsByModel } from "@/lib/product-helpers";
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -37,7 +37,61 @@ function ProductsContent() {
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryFromUrl);
   const [sortBy, setSortBy] = useState<string>("best-selling");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch('/api/products/categories');
+        const data = await response.json();
+        if (data.success) {
+          setCategories(data.data.map((c: any) => c.category));
+        }
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      }
+    }
+    fetchCategories();
+  }, []);
+
+  // Fetch products when category changes
+  useEffect(() => {
+    async function fetchProducts() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const url = selectedCategory === 'all' 
+          ? '/api/products'
+          : `/api/products/${selectedCategory}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+          // Transform database products to UI format
+          const transformedProducts = data.data.map((p: any) => 
+            transformProductFromDB(p, p.category || selectedCategory)
+          );
+          // Group products by model number
+          const groupedProducts = groupProductsByModel(transformedProducts);
+          setProducts(groupedProducts);
+        } else {
+          setError(data.error || 'Failed to fetch products');
+        }
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Failed to fetch products');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    fetchProducts();
+  }, [selectedCategory]);
 
   // Update category when URL changes
   useEffect(() => {
@@ -49,31 +103,24 @@ function ProductsContent() {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, sortBy]);
 
-  // Simulate lazy loading
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [currentPage, searchQuery, selectedCategory, sortBy]);
-
   const filteredProducts = useMemo(() => {
-    let filtered: Product[] = [...products];
-
-    // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter((p) => p.category === selectedCategory);
-    }
+    let filtered: any[] = [...products];
 
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query) ||
-          p.description.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query)
+        (p) => {
+          const modelNumber = p.modelNumber || p.model_number || '';
+          const price = p.price || '';
+          const color = p.color || '';
+          
+          return (
+            modelNumber.toLowerCase().includes(query) ||
+            price.toString().toLowerCase().includes(query) ||
+            color.toLowerCase().includes(query)
+          );
+        }
       );
     }
 
@@ -85,14 +132,14 @@ function ProductsContent() {
       filtered = filtered.reverse();
     } else if (sortBy === "price") {
       filtered = filtered.sort((a, b) => {
-        const aMinPrice = Math.min(...a.variants.map((v) => v.price));
-        const bMinPrice = Math.min(...b.variants.map((v) => v.price));
-        return aMinPrice - bMinPrice;
+        const aPrice = parseFloat(a.price || '0');
+        const bPrice = parseFloat(b.price || '0');
+        return aPrice - bPrice;
       });
     }
 
     return filtered;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [products, searchQuery, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
@@ -107,17 +154,40 @@ function ProductsContent() {
 
   const categoryLabels: Record<string, string> = {
     all: "All Categories",
-    "wall-clocks": "Wall Clocks",
-    "desk-clocks": "Desk Clocks",
-    "premium-gifting": "Premium Gifting",
-    "personalized": "Personalized",
+    ...Object.fromEntries(
+      categories.map(cat => [cat, getCategoryDisplayName(cat)])
+    )
   };
 
   return (
     <div className="min-h-screen">
       <Navbar />
-      <main className="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
-          {/* Top Controls */}
+      
+      {/* Category Banner */}
+      <div className="relative h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=1200&h=400&fit=crop')] bg-cover bg-center opacity-20" />
+        <div className="relative container mx-auto px-4 sm:px-6 md:px-8 h-full flex flex-col justify-center items-center text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4">
+            {selectedCategory === 'all' 
+              ? 'All Products' 
+              : getCategoryDisplayName(selectedCategory)}
+          </h1>
+          <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-2xl">
+            {selectedCategory === 'all'
+              ? 'Discover our complete collection of premium clocks for corporate gifting'
+              : `Explore our ${getCategoryDisplayName(selectedCategory).toLowerCase()} collection`}
+          </p>
+        </div>
+      </div>
+
+      <main className="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">{/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-red-800 dark:text-red-200">{error}</p>
+            </div>
+          )}
+                    {/* Top Controls */}
           <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
             <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
               {/* Search */}

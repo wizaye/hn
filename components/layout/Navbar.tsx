@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import {
@@ -21,10 +21,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { NoiseBackground } from "@/components/ui/noise-background";
 import { cn } from "@/lib/utils";
+import { getCategoryDisplayName } from "@/lib/product-helpers";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch('/api/products/categories');
+        const data = await response.json();
+        if (data.success) {
+          setCategories(data.data.map((c: any) => c.category));
+        }
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   return (
     <header className="bg-background border-border/50 dark:border-border sticky top-0 z-50 w-full border-b">
@@ -57,50 +75,21 @@ export function Navbar() {
                       </p>
                     </Link>
                   </NavigationMenuLink>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href="/products?category=wall-clocks"
-                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    >
-                      <div className="text-sm font-medium leading-none">Wall Clocks</div>
-                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
-                        Premium wall clocks for offices
-                      </p>
-                    </Link>
-                  </NavigationMenuLink>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href="/products?category=desk-clocks"
-                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    >
-                      <div className="text-sm font-medium leading-none">Desk Clocks</div>
-                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
-                        Elegant desk clocks for executives
-                      </p>
-                    </Link>
-                  </NavigationMenuLink>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href="/products?category=premium-gifting"
-                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    >
-                      <div className="text-sm font-medium leading-none">Premium Gifting</div>
-                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
-                        Perfect for corporate gifting
-                      </p>
-                    </Link>
-                  </NavigationMenuLink>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href="/products?category=personalized"
-                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    >
-                      <div className="text-sm font-medium leading-none">Personalized</div>
-                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
-                        Custom with your company logo
-                      </p>
-                    </Link>
-                  </NavigationMenuLink>
+                  {categories.map((category) => (
+                    <NavigationMenuLink key={category} asChild>
+                      <Link
+                        href={`/products?category=${category}`}
+                        className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      >
+                        <div className="text-sm font-medium leading-none">
+                          {getCategoryDisplayName(category)}
+                        </div>
+                        <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
+                          Browse {getCategoryDisplayName(category).toLowerCase()}
+                        </p>
+                      </Link>
+                    </NavigationMenuLink>
+                  ))}
                 </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
@@ -198,34 +187,16 @@ export function Navbar() {
                   >
                     All Categories
                   </Link>
-                  <Link
-                    href="/products?category=wall-clocks"
-                    className="flex items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Wall Clocks
-                  </Link>
-                  <Link
-                    href="/products?category=desk-clocks"
-                    className="flex items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Desk Clocks
-                  </Link>
-                  <Link
-                    href="/products?category=premium-gifting"
-                    className="flex items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Premium Gifting
-                  </Link>
-                  <Link
-                    href="/products?category=personalized"
-                    className="flex items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Personalized
-                  </Link>
+                  {categories.map((category) => (
+                    <Link
+                      key={category}
+                      href={`/products?category=${category}`}
+                      className="flex items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {getCategoryDisplayName(category)}
+                    </Link>
+                  ))}
                 </CollapsibleContent>
               </Collapsible>
 
