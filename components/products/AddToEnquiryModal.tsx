@@ -80,7 +80,7 @@ export function AddToEnquiryModal({
   }, [open, editingVariantId, product.id, allVariants, getCartItem]);
 
   const handleUpdateCart = async () => {
-    const variant = allVariants.find((v) => v.id === selectedVariant);
+    const variant = allVariants.find((v: any) => v.id === selectedVariant);
     if (!variant) return;
 
     const quantityNum = parseInt(quantity) || 1;
@@ -136,7 +136,7 @@ export function AddToEnquiryModal({
     toast.success("Variant removed from enquiry list");
   };
 
-  const selectedVariantData = allVariants.find((v) => v.id === selectedVariant);
+  const selectedVariantData = allVariants.find((v: any) => v.id === selectedVariant);
   const existingItem = getCartItem(product.id, selectedVariant);
   const isEditing = !!existingItem || !!editingVariantId;
   const hasAnyVariantInCart = cartItems.length > 0;
@@ -158,7 +158,7 @@ export function AddToEnquiryModal({
                 <Label>Current Variants in Enquiry List</Label>
                 <div className="rounded-lg border divide-y">
                   {cartItems.map((item) => {
-                    const variant = allVariants.find((v) => v.id === item.variantId);
+                    const variant = allVariants.find((v: any) => v.id === item.variantId);
                     return (
                       <div
                         key={item.variantId}
@@ -221,7 +221,7 @@ export function AddToEnquiryModal({
                   <SelectValue placeholder="Select variant" />
                 </SelectTrigger>
                 <SelectContent>
-                  {allVariants.map((variant) => (
+                  {allVariants.map((variant: any) => (
                     <SelectItem key={variant.id} value={variant.id}>
                       {variant.color ? `${variant.color} - ${formatCurrency(variant.price, 'INR')}` : `${variant.name} - ${formatCurrency(variant.price, 'INR')}`}
                     </SelectItem>
