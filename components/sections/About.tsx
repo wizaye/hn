@@ -35,7 +35,7 @@ export function About() {
           </div>
 
           {/* Right Column - Autoplay Carousel */}
-          <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] rounded-lg overflow-hidden border">
+          <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] w-full rounded-lg overflow-hidden border shadow-lg">
             <FramerCarousel images={images} autoplayInterval={4000} className="w-full h-full" />
           </div>
         </div>

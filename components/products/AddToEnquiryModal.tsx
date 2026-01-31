@@ -106,10 +106,12 @@ export function AddToEnquiryModal({
       const item: EnquiryItem = {
         productId: product.id,
         productName: product.name,
+        modelNumber: product.modelNumber,
         variantId: variant.id,
         variantName: variant.name,
         quantity: quantityNum,
         price: variant.price,
+        colorCode: variant.colorCode,
       };
       addToCart(item);
       toast.success("Variant added!");

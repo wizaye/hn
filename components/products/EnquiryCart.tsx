@@ -25,7 +25,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
-import { products } from "@/lib/data";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -240,12 +239,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
           <div className="flex-1 overflow-y-auto px-4 py-6">
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-                <div className="relative mb-6">
-                  <ShoppingCart className="h-16 w-16 text-muted-foreground/30" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-8 w-8 rounded-full bg-muted" />
-                  </div>
-                </div>
+                <ShoppingCart className="h-16 w-16 text-muted-foreground/30 mb-6" />
                 <h3 className="text-lg font-semibold mb-2">Your enquiry cart is empty</h3>
                 <p className="text-sm text-muted-foreground max-w-xs">
                   Add products from the catalog to start building your enquiry
@@ -254,16 +248,17 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
             ) : (
               <div className="space-y-6">
                 {Object.entries(groupedItems).map(([productId, productItems]) => {
-                  const product = products.find((p) => p.id === productId);
+                  // Get product info from first item (all items have same product info)
+                  const firstItem = productItems[0];
                   return (
                     <div key={productId} className="space-y-3">
                       {/* Product Header */}
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="font-semibold text-base">{product?.name || "Product"}</h3>
-                          {product?.modelNumber && (
+                          <h3 className="font-semibold text-base">{firstItem.productName}</h3>
+                          {firstItem.modelNumber && (
                             <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                              {product.modelNumber}
+                              {firstItem.modelNumber}
                             </p>
                           )}
                         </div>
@@ -275,7 +270,6 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                       {/* Variants List - Table-like format */}
                       <div className="rounded-xl border bg-card/50 divide-y overflow-hidden">
                         {productItems.map((item, idx) => {
-                          const variant = product?.variants.find((v) => v.id === item.variantId);
                           const itemTotal = item.quantity * item.price;
                           return (
                             <div
@@ -284,11 +278,11 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                             >
                               <div className="flex items-center gap-4">
                                 {/* Color Swatch */}
-                                {variant?.color && (
+                                {item.colorCode && (
                                   <div
                                     className="h-4 w-4 rounded-full border border-border flex-shrink-0"
                                     style={{
-                                      backgroundColor: variant.colorCode || "#000",
+                                      backgroundColor: item.colorCode || "#000",
                                     }}
                                   />
                                 )}

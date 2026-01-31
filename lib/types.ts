@@ -22,10 +22,12 @@ export interface Product {
 export interface EnquiryItem {
   productId: string;
   productName: string;
+  modelNumber: string;
   variantId: string;
   variantName: string;
   quantity: number;
   price: number;
+  colorCode?: string;
 }
 
 export interface EnquiryFormData {

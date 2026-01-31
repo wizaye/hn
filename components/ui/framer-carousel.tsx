@@ -59,7 +59,7 @@ export function FramerCarousel({
   }, [currentIndex, autoplayInterval, paginate]);
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`relative overflow-hidden rounded-lg ${className}`}>
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={currentIndex}
@@ -90,6 +90,7 @@ export function FramerCarousel({
             src={images[currentIndex]}
             alt={`Slide ${currentIndex + 1}`}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         </motion.div>
       </AnimatePresence>
@@ -98,32 +99,32 @@ export function FramerCarousel({
       <Button
         variant="ghost"
         size="icon"
-        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background/90 backdrop-blur-sm"
+        className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 h-8 w-8 sm:h-10 sm:w-10 bg-background/80 hover:bg-background/90 backdrop-blur-sm"
         onClick={() => paginate(-1)}
       >
-        <ChevronLeft className="h-6 w-6" />
+        <ChevronLeft className="h-4 w-4 sm:h-6 sm:w-6" />
       </Button>
       <Button
         variant="ghost"
         size="icon"
-        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background/90 backdrop-blur-sm"
+        className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 h-8 w-8 sm:h-10 sm:w-10 bg-background/80 hover:bg-background/90 backdrop-blur-sm"
         onClick={() => paginate(1)}
       >
-        <ChevronRight className="h-6 w-6" />
+        <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6" />
       </Button>
 
       {/* Dots Indicator */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+      <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-1.5 sm:gap-2">
         {images.map((_, index) => (
           <button
             key={index}
             onClick={() =>
               setCurrentIndex([index, index > currentIndex ? 1 : -1])
             }
-            className={`h-2 rounded-full transition-all ${
+            className={`h-1.5 sm:h-2 rounded-full transition-all ${
               index === currentIndex
-                ? "w-8 bg-white"
-                : "w-2 bg-white/50 hover:bg-white/75"
+                ? "w-6 sm:w-8 bg-white"
+                : "w-1.5 sm:w-2 bg-white/50 hover:bg-white/75"
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
