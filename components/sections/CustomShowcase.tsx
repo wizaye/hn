@@ -6,39 +6,45 @@ import { Marquee } from "@/components/ui/marquee";
 
 const showcaseItems = [
   {
-    title: "Laser Engraving",
-    description: "Precision laser engraving for custom text and logos on premium materials",
-    image: "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=400&h=400&fit=crop",
+    title: "Single Color Screen Printing",
+    description: "Precise single-color prints perfect for minimalist logos and high-contrast branding",
+    image: "/custom_work/single color.png",
     gradient: ["rgb(255, 100, 150)", "rgb(100, 150, 255)", "rgb(255, 200, 100)"],
   },
   {
-    title: "Logo Printing",
-    description: "High-quality logo printing with vibrant colors and durable finishes",
-    image: "https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=400&h=400&fit=crop",
+    title: "Double Color Screen Printing",
+    description: "Two-tone printing for logos requiring more depth and visual hierarchy",
+    image: "/custom_work/double color.png",
     gradient: ["rgb(100, 150, 255)", "rgb(150, 100, 255)", "rgb(255, 150, 100)"],
   },
   {
-    title: "Custom Packaging",
-    description: "Branded packaging solutions that make your corporate gifts stand out",
-    image: "https://images.unsplash.com/photo-1594831289848-b8e1b8908ea8?w=400&h=400&fit=crop",
+    title: "Multi Color Screen Printing",
+    description: "Vibrant multi-color screen printing for complex manufacturing and colorful designs",
+    image: "/custom_work/multi color.png",
     gradient: ["rgb(255, 150, 100)", "rgb(100, 200, 255)", "rgb(255, 200, 100)"],
   },
   {
-    title: "Bulk Corporate Themes",
-    description: "Themed clock collections designed for large-scale corporate gifting programs",
-    image: "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400&h=400&fit=crop",
+    title: "Dial Printing",
+    description: "Custom printed clock dials featuring your brand identity right on the face",
+    image: "/custom_work/Dial.png",
     gradient: ["rgb(150, 255, 100)", "rgb(255, 150, 200)", "rgb(100, 200, 255)"],
   },
   {
-    title: "Personalized Designs",
-    description: "Unique clock designs tailored to your company's aesthetic and values",
-    image: "https://images.unsplash.com/photo-1495364141860-b0d03eccd065?w=400&h=400&fit=crop",
+    title: "Sticker Customization",
+    description: "High-quality stickers for branding and personalization",
+    image: "/custom_work/sticker.png",
+    gradient: ["rgb(255, 100, 150)", "rgb(100, 150, 255)", "rgb(255, 200, 100)"],
+  },
+  {
+    title: "Box Customization",
+    description: "Fully customized box packaging to match your corporate identity",
+    image: "",
     gradient: ["rgb(255, 200, 100)", "rgb(100, 150, 255)", "rgb(255, 100, 150)"],
   },
   {
-    title: "Premium Materials",
-    description: "Luxury materials including wood, metal, and glass for executive gifts",
-    image: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=400&h=400&fit=crop",
+    title: "Customized Packing",
+    description: "Specialized packing solutions ensuring safety and premium unboxing experience",
+    image: "",
     gradient: ["rgb(100, 200, 255)", "rgb(255, 150, 100)", "rgb(150, 255, 100)"],
   },
 ];
@@ -65,10 +71,10 @@ export function CustomShowcase() {
         <div className="relative">
           {/* Left fade */}
           <div className="absolute left-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-          
+
           {/* Right fade */}
           <div className="absolute right-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-          
+
           <Marquee pauseOnHover className="[--duration:40s]">
             {showcaseItems.map((item, idx) => (
               <div key={idx} className="mx-2 w-[280px] sm:w-[320px]">
@@ -79,12 +85,12 @@ export function CustomShowcase() {
                   <div className="flex h-[380px] sm:h-[400px] flex-col overflow-hidden rounded-lg bg-white text-center dark:bg-neutral-800">
                     {/* Icon/Image Section */}
                     <div className="relative h-48 sm:h-52 w-full overflow-hidden">
-                      {!imageErrors[idx] ? (
+                      {item.image && !imageErrors[idx] ? (
                         <>
                           <img
                             src={item.image}
                             alt={item.title}
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-contain p-4"
                             onError={() => handleImageError(idx)}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />

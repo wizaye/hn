@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Phone, Clock } from "lucide-react";
+import { MapPin, Phone, Clock, Share2 } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -32,33 +32,43 @@ const LinkedInIcon = (props: React.ComponentProps<"svg">) => (
 const contactInfo = [
   {
     icon: Phone,
-    title: "Contact Us",
-    details: [
-      { label: "Phone", value: "+91-7893002716" },
-      { label: "Email", value: "sales@hyderabadnetworks.com" },
-    ],
-    description: "We're available Mon-Sat, 9am-7pm. Email responses within 24hrs.",
+    title: "CONTACT US",
+    content: (
+      <div className="flex flex-col gap-0.5">
+        <p className="font-medium text-sm">Phone: +91-7893002716</p>
+        <p className="font-medium text-sm">Email: info@hyderabadnetwork.com</p>
+      </div>
+    ),
     href: "tel:+917893002716",
   },
   {
     icon: MapPin,
-    title: "Visit Our Showroom",
-    details: [
-      { label: null, value: "Shop No. 4-1, old Big Bazar Car Parking" },
-      { label: null, value: "Back Side SMART Bazar, 834/A, Lane" },
-      { label: null, value: "Abids, Hyderabad, Telangana 500001" },
-    ],
-    description: "Authorised Distributor for Ajanta & Orpat Group",
+    title: "OUR SHOWROOM",
+    content: (
+      <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
+        <p>Shop No. 4-1, Old Big Bazar Car Parking</p>
+        <p>Back Side SMART Bazar, 834/A, Lane</p>
+        <p>Abids, Hyderabad, Telangana 500001</p>
+        <p className="text-xs mt-1 text-muted-foreground/80">Authorised Distributor for Ajanta & Orpat Group</p>
+      </div>
+    ),
     href: "https://maps.google.com/maps?q=Hyderabad+Network+(Authorised+Distributor+for+Ajanta+%26+Orpat+Group)",
   },
   {
     icon: Clock,
-    title: "Business Hours",
-    details: [
-      { label: null, value: "Mon-Sat: 9:00 AM - 7:00 PM" },
-      { label: null, value: "Sunday: 12:00 PM - 6:00 PM" },
-    ],
-    description: "Visit us during these hours for the best service.",
+    title: "BUSINESS HOURS",
+    content: (
+      <div className="flex flex-col gap-1 text-sm font-medium w-full max-w-[300px]">
+        <div className="flex justify-between">
+          <span>Mon - Sat:</span>
+          <span>11:00 AM - 9:00 PM</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Sunday:</span>
+          <span>Closed</span>
+        </div>
+      </div>
+    ),
   },
 ];
 
@@ -85,38 +95,29 @@ const socialLinks = [
   },
 ];
 
-type ContactBox = {
+type ContactBoxProps = {
   icon: LucideIcon;
   title: string;
-  description: string;
-  details: { label: string | null; value: string }[];
+  content: React.ReactNode;
   href?: string;
   className?: string;
 };
 
-function Box({ title, description, className, details, href, icon: Icon }: ContactBox) {
-  const content = (
-    <>
-      <div className="flex items-center gap-x-3 border-b bg-secondary/50 p-3 dark:bg-secondary/20">
-        <Icon className="size-4 text-muted-foreground" strokeWidth={1.5} />
-        <h2 className="font-medium text-base tracking-wide">{title}</h2>
+function Box({ title, content, className, href, icon: Icon }: ContactBoxProps) {
+  const innerContent = (
+    <div className="flex gap-4 p-6 h-full items-start">
+      <div className="flex-shrink-0 mt-1">
+        <div className="size-10 rounded-full bg-muted flex items-center justify-center">
+          <Icon className="size-5 text-muted-foreground" strokeWidth={1.5} />
+        </div>
       </div>
-      <div className="flex flex-col gap-y-1.5 p-3 py-4">
-        {details.map((detail, i) => (
-          <div key={i} className="flex items-center gap-x-2">
-            {detail.label && (
-              <span className="text-xs text-muted-foreground min-w-[50px]">{detail.label}:</span>
-            )}
-            <span className="font-medium font-mono text-xs tracking-wide">
-              {detail.value}
-            </span>
-          </div>
-        ))}
+      <div className="flex flex-col gap-2 flex-grow">
+        <h3 className="font-bold text-sm tracking-wide uppercase text-foreground/80">{title}</h3>
+        <div className="text-foreground">
+          {content}
+        </div>
       </div>
-      <div className="border-t p-3">
-        <p className="text-muted-foreground text-xs">{description}</p>
-      </div>
-    </>
+    </div>
   );
 
   if (href) {
@@ -126,23 +127,18 @@ function Box({ title, description, className, details, href, icon: Icon }: Conta
         target={href.startsWith("http") ? "_blank" : undefined}
         rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
         className={cn(
-          "flex flex-col justify-between border rounded-lg overflow-hidden hover:shadow-md transition-shadow",
+          "bg-background rounded-xl border shadow-sm hover:shadow-md transition-shadow",
           className
         )}
       >
-        {content}
+        {innerContent}
       </a>
     );
   }
 
   return (
-    <div
-      className={cn(
-        "flex flex-col justify-between border rounded-lg overflow-hidden",
-        className
-      )}
-    >
-      {content}
+    <div className={cn("bg-background rounded-xl border shadow-sm", className)}>
+      {innerContent}
     </div>
   );
 }
@@ -151,66 +147,65 @@ export function VisitUs() {
   return (
     <section id="visit-us" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6 md:px-8 max-w-7xl">
-        <div className="mb-8 sm:mb-10 md:mb-12 text-center">
-          <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-muted-foreground tracking-tight">
-            Visit <span className="text-foreground">Us</span>
+        <div className="mb-12 sm:mb-16 text-center">
+          <h2 className="mb-4 text-3xl sm:text-4xl font-bold tracking-tight">
+            Visit Us
           </h2>
-          <p className="mx-auto max-w-xl md:max-w-2xl text-sm sm:text-base md:text-lg text-muted-foreground px-4">
-            Get in touch with us or visit our showroom to explore our collection
+          <p className="mx-auto max-w-xl text-muted-foreground">
+            Get in touch with us or visit our showroom to explore our collection.
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Left side - Contact boxes in 2 columns */}
-          <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid gap-6 lg:grid-cols-2 lg:gap-8 items-start">
+          {/* Left side - Information Cards */}
+          <div className="flex flex-col gap-4">
             {contactInfo.map((item, idx) => (
               <Box
                 key={idx}
                 icon={item.icon}
                 title={item.title}
-                description={item.description}
-                details={item.details}
+                content={item.content}
                 href={item.href}
-                className={idx === 0 ? "sm:col-span-2" : ""}
               />
             ))}
+
+            {/* Social Links Card */}
+            <Box
+              icon={Share2}
+              title="CONNECT WITH US"
+              content={
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {socialLinks.map((link) => (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center size-8 rounded-full bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+                      title={link.label}
+                    >
+                      <link.icon className="size-4" />
+                      <span className="sr-only">{link.label}</span>
+                    </a>
+                  ))}
+                </div>
+              }
+            />
           </div>
 
           {/* Right side - Map */}
-          <div className="rounded-lg overflow-hidden border bg-muted min-h-[400px] lg:min-h-full">
+          <div className="rounded-xl overflow-hidden border bg-muted h-[400px] lg:h-full lg:min-h-[600px] shadow-sm">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60903.118215580835!2d78.44015556953127!3d17.438407935443735!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb977d612c6e45%3A0xc314db2fe6da506f!2sHyderabad%20Network%20(Authorised%20Distributor%20for%20Ajanta%20%26%20Orpat%20Group)!5e0!3m2!1sen!2sin!4v1769278199509!5m2!1sen!2sin"
               width="100%"
               height="100%"
-              style={{ border: 0, minHeight: "450px" }}
+              style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               title="Hyderabad Network Location"
+              className="w-full h-full"
             />
-          </div>
-        </div>
-
-        {/* Social Links Section */}
-        <div className="mt-12 flex flex-col items-center justify-center gap-4">
-          <h3 className="text-center font-medium text-xl text-muted-foreground tracking-tight">
-            Find us <span className="text-foreground">online</span>
-          </h3>
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {socialLinks.map((link) => (
-              <a
-                className="flex items-center gap-x-2 rounded-full border bg-card px-3 py-1.5 shadow hover:bg-accent transition-colors"
-                href={link.href}
-                key={link.label}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <link.icon className="size-3.5 text-muted-foreground" />
-                <span className="font-medium font-mono text-xs tracking-wide">
-                  {link.label}
-                </span>
-              </a>
-            ))}
           </div>
         </div>
       </div>

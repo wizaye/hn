@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -51,9 +52,17 @@ export function Navbar() {
 
 
         {/* Logo - Desktop & Mobile */}
-        <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0 mr-4 lg:mr-0">
-          <span className="text-base md:text-lg font-bold truncate">
-            Hyderabad Networks
+        <Link href="/" className="flex items-center gap-3 shrink-0 min-w-0 mr-4 lg:mr-0">
+          <Image
+            src="/hn_logo.png"
+            alt="Hyderabad Network"
+            width={40}
+            height={40}
+            className="size-10 object-contain"
+            priority
+          />
+          <span className="text-lg font-bold truncate">
+            Hyderabad Network
           </span>
         </Link>
 
@@ -165,7 +174,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 z-50 border-b rounded-b-xl bg-background/95 backdrop-blur-sm lg:hidden shadow-lg"
+            className="absolute top-full left-0 right-0 z-50 border-b rounded-b-xl bg-background lg:hidden shadow-lg"
           >
             <nav className="container mx-auto px-4 py-4 space-y-1">
               {/* Products Collapsible */}

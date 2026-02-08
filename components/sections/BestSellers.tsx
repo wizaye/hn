@@ -16,17 +16,27 @@ export function BestSellers() {
       try {
         const response = await fetch('/api/products');
         const data = await response.json();
-        
+
         if (data.success) {
           // Transform products
           const transformedProducts = data.data
             .map((p: any) => transformProductFromDB(p, p.category));
-          
+
           // Group by model number so same models with different colors show as one card
           const groupedProducts = groupProductsByModel(transformedProducts);
-          
-          // Take first 8 grouped products as best sellers
-          setProducts(groupedProducts.slice(0, 8));
+
+          // Filter for specific best seller models
+          const bestSellerModels = ["PDS-397", "GF-3127", "MP-2827", "DS-157"];
+          const filteredProducts = groupedProducts.filter(p =>
+            bestSellerModels.includes(p.modelNumber)
+          );
+
+          // Sort according to the order in bestSellerModels
+          filteredProducts.sort((a, b) => {
+            return bestSellerModels.indexOf(a.modelNumber) - bestSellerModels.indexOf(b.modelNumber);
+          });
+
+          setProducts(filteredProducts);
         }
       } catch (error) {
         console.error('Error fetching best sellers:', error);
@@ -34,7 +44,7 @@ export function BestSellers() {
         setIsLoading(false);
       }
     }
-    
+
     fetchBestSellers();
   }, []);
 
