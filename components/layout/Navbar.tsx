@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, ChevronDown } from "lucide-react";
+import { Menu, ChevronDown, ShoppingCart } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   NavigationMenu,
@@ -23,11 +23,15 @@ import { Button } from "@/components/ui/button";
 import { NoiseBackground } from "@/components/ui/noise-background";
 import { cn } from "@/lib/utils";
 import { getCategoryDisplayName } from "@/lib/product-helpers";
+import { useCartOpen } from "@/components/products/EnquiryCart";
+import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
+  const { setIsOpen: setIsCartOpen } = useCartOpen();
+  const { uniqueProductsCount } = useEnquiryCart();
 
   // Fetch categories on mount
   useEffect(() => {
@@ -47,11 +51,8 @@ export function Navbar() {
 
   return (
     <header className="bg-background border-border/50 dark:border-border sticky top-0 z-50 w-full border-b">
-      <div className="container mx-auto flex h-16 items-center gap-2 px-4 sm:px-6 md:px-8 max-w-7xl w-full">
-        {/* Mobile Menu Button + Logo */}
-
-
-        {/* Logo - Desktop & Mobile */}
+      <div className="flex h-16 items-center justify-between px-6 md:px-10 lg:px-16 w-full">
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-3 shrink-0 min-w-0 mr-4 lg:mr-0">
           <Image
             src="/hn_logo.png"
@@ -61,7 +62,7 @@ export function Navbar() {
             className="size-10 object-contain"
             priority
           />
-          <span className="text-lg font-bold truncate">
+          <span className="text-lg font-bold font-serif truncate">
             Hyderabad Network
           </span>
         </Link>
@@ -70,7 +71,7 @@ export function Navbar() {
         <NavigationMenu className="hidden lg:flex ml-6">
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="font-serif">Products</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <div className="grid gap-0.5 p-2 w-[240px]">
                   <NavigationMenuLink asChild>
@@ -78,7 +79,7 @@ export function Navbar() {
                       href="/products"
                       className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     >
-                      <div className="text-sm font-medium leading-none">All Categories</div>
+                      <div className="text-sm font-medium leading-none font-serif">All Categories</div>
                       <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
                         Browse our complete catalog
                       </p>
@@ -90,7 +91,7 @@ export function Navbar() {
                         href={`/products?category=${category}`}
                         className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       >
-                        <div className="text-sm font-medium leading-none">
+                        <div className="text-sm font-medium leading-none font-serif">
                           {getCategoryDisplayName(category)}
                         </div>
                         <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
@@ -104,14 +105,14 @@ export function Navbar() {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/#custom-work">
+                <Link href="/#custom-work" className="font-serif">
                   Custom Work
                 </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/contact">
+                <Link href="/contact" className="font-serif">
                   Contact
                 </Link>
               </NavigationMenuLink>
@@ -120,7 +121,21 @@ export function Navbar() {
         </NavigationMenu>
 
         {/* Desktop CTA Button */}
-        <div className="ml-auto flex items-center gap-2 lg:flex-1 lg:justify-end">
+        <div className="ml-auto flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden lg:flex relative"
+            onClick={() => setIsCartOpen(true)}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {uniqueProductsCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-background animate-in zoom-in-50">
+                {uniqueProductsCount}
+              </span>
+            )}
+          </Button>
+
           <NoiseBackground
             containerClassName="hidden lg:block p-1 rounded-full"
             gradientColors={[
@@ -131,15 +146,15 @@ export function Navbar() {
           >
             <Link
               href="/enquire"
-              className="flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-neutral-100 via-neutral-100 to-white px-4 py-1.5 text-xs font-medium text-black shadow-[0px_2px_0px_0px_rgb(245,245,245)_inset,0px_0.5px_1px_0px_rgb(163,163,163)] transition-all duration-100 active:scale-[0.98] dark:from-black dark:via-black dark:to-neutral-900 dark:text-white dark:shadow-[0px_1px_0px_0px_rgb(10,10,10)_inset,0px_1px_0px_0px_rgb(38,38,38)] hover:shadow-md"
+              className="flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-neutral-100 via-neutral-100 to-white px-6 py-2 text-xs font-bold font-serif text-black shadow-sm transition-all duration-200 active:scale-[0.98] hover:shadow-md uppercase tracking-wider"
             >
-              Enquire Now &rarr;
+              Enquire Now
             </Link>
           </NoiseBackground>
         </div>
 
-        {/* Mobile Menu Button - Moved to Right */}
-        <div className="flex lg:hidden items-center gap-2 ml-auto">
+        {/* Mobile - Menu Button on Right */}
+        <div className="flex lg:hidden items-center">
           <Button
             variant="ghost"
             className="h-8 w-8 px-0 hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 items-center justify-center gap-2.5"

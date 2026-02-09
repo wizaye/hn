@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SaleBanner } from "@/components/sections/SaleBanner";
 import { EnquiryCartProvider } from "@/hooks/use-enquiry-cart";
-import { CartOpenProvider } from "@/components/products/EnquiryCart";
+import { CartOpenProvider, EnquiryCart } from "@/components/products/EnquiryCart";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -34,6 +34,7 @@ export default function RootLayout({
         <EnquiryCartProvider>
           <CartOpenProvider>
             <SaleBanner />
+            <EnquiryCart />
             {children}
             <Toaster position="top-right" />
           </CartOpenProvider>

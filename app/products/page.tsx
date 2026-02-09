@@ -2,9 +2,9 @@
 
 import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { Search } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -12,18 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/products/ProductCard";
-import { EnquiryCart } from "@/components/products/EnquiryCart";
+import {
+  FilterSidebarDesktop,
+  FilterSidebarMobile,
+  FilterState,
+} from "@/components/products/FilterSidebar";
 import { Product } from "@/lib/types";
 import { transformProductFromDB, getCategoryDisplayName, groupProductsByModel } from "@/lib/product-helpers";
 
@@ -31,16 +25,21 @@ const PRODUCTS_PER_PAGE = 12;
 
 function ProductsContent() {
   const searchParams = useSearchParams();
-  const categoryFromUrl = searchParams.get("category") || "all";
-  
+  const categoryFromUrl = searchParams.get("category") || "";
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>(categoryFromUrl);
   const [sortBy, setSortBy] = useState<string>("best-selling");
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Filter state
+  const [selectedFilters, setSelectedFilters] = useState<FilterState>({
+    categories: categoryFromUrl ? [categoryFromUrl] : [],
+    priceRange: null,
+  });
 
   // Fetch categories on mount
   useEffect(() => {
@@ -58,25 +57,19 @@ function ProductsContent() {
     fetchCategories();
   }, []);
 
-  // Fetch products when category changes
+  // Fetch all products once (we'll filter client-side for better UX)
   useEffect(() => {
     async function fetchProducts() {
       setIsLoading(true);
       setError(null);
       try {
-        const url = selectedCategory === 'all' 
-          ? '/api/products'
-          : `/api/products/${selectedCategory}`;
-        
-        const response = await fetch(url);
+        const response = await fetch('/api/products');
         const data = await response.json();
-        
+
         if (data.success) {
-          // Transform database products to UI format
-          const transformedProducts = data.data.map((p: any) => 
-            transformProductFromDB(p, p.category || selectedCategory)
+          const transformedProducts = data.data.map((p: any) =>
+            transformProductFromDB(p, p.category)
           );
-          // Group products by model number
           const groupedProducts = groupProductsByModel(transformedProducts);
           setProducts(groupedProducts);
         } else {
@@ -89,57 +82,81 @@ function ProductsContent() {
         setIsLoading(false);
       }
     }
-    
-    fetchProducts();
-  }, [selectedCategory]);
 
-  // Update category when URL changes
+    fetchProducts();
+  }, []);
+
+  // Update filters when URL changes
   useEffect(() => {
-    setSelectedCategory(categoryFromUrl);
+    if (categoryFromUrl) {
+      setSelectedFilters(prev => ({
+        ...prev,
+        categories: [categoryFromUrl]
+      }));
+    }
   }, [categoryFromUrl]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [searchQuery, selectedFilters, sortBy]);
 
+  // Apply filters
   const filteredProducts = useMemo(() => {
-    let filtered: any[] = [...products];
+    let filtered = [...products];
+
+    // Filter by categories
+    if (selectedFilters.categories.length > 0) {
+      filtered = filtered.filter((p) =>
+        selectedFilters.categories.includes(p.category)
+      );
+    }
+
+    // Filter by price range
+    if (selectedFilters.priceRange) {
+      filtered = filtered.filter((p) => {
+        const price = p.variants?.[0]?.price || 0;
+        return (
+          price >= selectedFilters.priceRange!.min &&
+          price <= selectedFilters.priceRange!.max
+        );
+      });
+    }
 
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (p) => {
-          const modelNumber = p.modelNumber || p.model_number || '';
-          const price = p.price || '';
-          const color = p.color || '';
-          
-          return (
-            modelNumber.toLowerCase().includes(query) ||
-            price.toString().toLowerCase().includes(query) ||
-            color.toLowerCase().includes(query)
-          );
-        }
-      );
+      filtered = filtered.filter((p) => {
+        const modelNumber = p.modelNumber || p.model_number || '';
+        const price = p.price || '';
+        const color = p.color || '';
+        return (
+          modelNumber.toLowerCase().includes(query) ||
+          price.toString().toLowerCase().includes(query) ||
+          color.toLowerCase().includes(query)
+        );
+      });
     }
 
     // Sort
-    if (sortBy === "best-selling") {
-      // Keep original order for best-selling
-    } else if (sortBy === "new-arrivals") {
-      // Reverse order for new arrivals
+    if (sortBy === "new-arrivals") {
       filtered = filtered.reverse();
-    } else if (sortBy === "price") {
+    } else if (sortBy === "price-low") {
       filtered = filtered.sort((a, b) => {
-        const aPrice = parseFloat(a.price || '0');
-        const bPrice = parseFloat(b.price || '0');
+        const aPrice = a.variants?.[0]?.price || 0;
+        const bPrice = b.variants?.[0]?.price || 0;
         return aPrice - bPrice;
+      });
+    } else if (sortBy === "price-high") {
+      filtered = filtered.sort((a, b) => {
+        const aPrice = a.variants?.[0]?.price || 0;
+        const bPrice = b.variants?.[0]?.price || 0;
+        return bPrice - aPrice;
       });
     }
 
     return filtered;
-  }, [products, searchQuery, sortBy]);
+  }, [products, selectedFilters, searchQuery, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
@@ -152,195 +169,264 @@ function ProductsContent() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
-  const categoryLabels: Record<string, string> = {
-    all: "All Categories",
-    ...Object.fromEntries(
-      categories.map(cat => [cat, getCategoryDisplayName(cat)])
-    )
-  };
-
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      
-      {/* Category Banner */}
-      <div className="relative h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=1200&h=400&fit=crop')] bg-cover bg-center opacity-20" />
-        <div className="relative container mx-auto px-4 sm:px-6 md:px-8 h-full flex flex-col justify-center items-center text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4">
-            {selectedCategory === 'all' 
-              ? 'All Products' 
-              : getCategoryDisplayName(selectedCategory)}
+
+      {/* Hero Section - Premium Editorial Style */}
+      <div className="relative w-full h-64 md:h-80 overflow-hidden bg-black">
+        <img
+          src="https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=1200&h=400&fit=crop"
+          alt="Premium clock collection"
+          className="absolute inset-0 w-full h-full object-cover opacity-70 grayscale"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        <div className="relative z-10 h-full flex flex-col justify-end px-6 md:px-16 pb-12 max-w-7xl mx-auto">
+          {/* Breadcrumb */}
+          <nav className="flex text-[10px] uppercase font-bold tracking-widest text-white/60 mb-4">
+            <a className="hover:text-white transition-colors" href="/">Home</a>
+            <span className="mx-2">/</span>
+            <a className="hover:text-white transition-colors" href="/products">Collection</a>
+            <span className="mx-2">/</span>
+            <span className="text-white">
+              {selectedFilters.categories.length === 1
+                ? getCategoryDisplayName(selectedFilters.categories[0])
+                : 'All Products'}
+            </span>
+          </nav>
+          <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-white italic tracking-wide">
+            {selectedFilters.categories.length === 1
+              ? getCategoryDisplayName(selectedFilters.categories[0])
+              : 'Elegant Timepieces'}
           </h1>
-          <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-2xl">
-            {selectedCategory === 'all'
-              ? 'Discover our complete collection of premium clocks for corporate gifting'
-              : `Explore our ${getCategoryDisplayName(selectedCategory).toLowerCase()} collection`}
+          <p className="text-white/80 text-[10px] font-medium mt-3 max-w-xl uppercase tracking-[0.2em]">
+            Official B2B Distributor for premium Ajanta and Orpat precision instruments.
           </p>
         </div>
       </div>
 
-      <main className="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">{/* Error Message */}
+      <main className="flex flex-col lg:flex-row px-6 md:px-10 lg:px-16 py-6 gap-6 lg:gap-8">
+        {/* Desktop Filter Sidebar */}
+        <FilterSidebarDesktop
+          categories={categories}
+          selectedFilters={selectedFilters}
+          onFilterChange={setSelectedFilters}
+          productCount={filteredProducts.length}
+        />
+
+        {/* Main Content */}
+        <div className="flex-1">
+          {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-red-800 dark:text-red-200">{error}</p>
+            <div className="mb-6 p-4 border border-red-500/50 bg-red-50 dark:bg-red-900/20">
+              <p className="text-red-800 dark:text-red-200 text-sm">{error}</p>
             </div>
           )}
-                    {/* Top Controls */}
-          <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
-            <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
+
+          {/* Top Controls */}
+          <div className="flex flex-col gap-3 mb-6">
+            {/* Mobile: Filters + Sort Row */}
+            <div className="flex lg:hidden items-center justify-between">
+              <FilterSidebarMobile
+                categories={categories}
+                selectedFilters={selectedFilters}
+                onFilterChange={setSelectedFilters}
+                productCount={filteredProducts.length}
+              />
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="border border-foreground/30 rounded-none px-3 py-2 h-auto text-[10px] font-black uppercase w-auto">
+                  <span className="text-foreground/50 mr-1">Sort:</span>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-none border-foreground">
+                  <SelectItem value="best-selling" className="rounded-none text-xs">Popularity</SelectItem>
+                  <SelectItem value="new-arrivals" className="rounded-none text-xs">Newest</SelectItem>
+                  <SelectItem value="price-low" className="rounded-none text-xs">Price: Low</SelectItem>
+                  <SelectItem value="price-high" className="rounded-none text-xs">Price: High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Mobile: Search Full Width */}
+            <div className="flex lg:hidden border border-foreground/30 px-3 py-2 items-center gap-2">
+              <Search className="h-4 w-4 text-foreground/40" />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="border-none bg-transparent focus:ring-0 focus:outline-none text-[11px] uppercase font-medium flex-1 placeholder:text-foreground/30"
+                placeholder="Search model..."
+                type="text"
+              />
+              <span className="text-[10px] font-bold text-foreground/40">{filteredProducts.length}</span>
+            </div>
+
+            {/* Desktop: Single Row */}
+            <div className="hidden lg:flex items-center gap-4">
               {/* Search */}
-              <div className="flex-1">
-                <Input
-                  placeholder="Search clocks..."
+              <div className="flex border border-foreground/30 px-3 py-2 items-center gap-2 w-64">
+                <Search className="h-4 w-4 text-foreground/40" />
+                <input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full md:max-w-md"
+                  className="border-none bg-transparent focus:ring-0 focus:outline-none text-[11px] uppercase font-medium flex-1 placeholder:text-foreground/30"
+                  placeholder="Search model..."
+                  type="text"
                 />
               </div>
 
-              {/* Filters and Sort */}
-              <div className="flex gap-2 sm:gap-3">
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="flex-1 sm:w-[140px] md:w-[160px]">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(categoryLabels).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Product Count */}
+              <span className="text-[11px] font-bold uppercase tracking-wide text-foreground/50">
+                {filteredProducts.length} products
+              </span>
 
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="flex-1 sm:w-[140px] md:w-[160px]">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="best-selling">Best Selling</SelectItem>
-                    <SelectItem value="new-arrivals">New Arrivals</SelectItem>
-                    <SelectItem value="price">Price (Low to High)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Spacer */}
+              <div className="flex-1" />
+
+              {/* Sort */}
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="border border-foreground/30 rounded-none px-3 py-2 h-auto text-[11px] font-bold uppercase w-auto">
+                  <span className="text-foreground/50 mr-1">Sort:</span>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-none border-foreground">
+                  <SelectItem value="best-selling" className="rounded-none text-xs">Popularity</SelectItem>
+                  <SelectItem value="new-arrivals" className="rounded-none text-xs">Newest</SelectItem>
+                  <SelectItem value="price-low" className="rounded-none text-xs">Price: Low</SelectItem>
+                  <SelectItem value="price-high" className="rounded-none text-xs">Price: High</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-
-            {/* Results count */}
-            {filteredProducts.length > 0 && (
-              <div className="text-sm text-muted-foreground">
-                Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
-              </div>
-            )}
           </div>
-
-          {/* Product Grid with Loading State */}
           {isLoading ? (
-            <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-12 gap-x-8">
               {Array.from({ length: PRODUCTS_PER_PAGE }).map((_, i) => (
-                <div key={i} className="space-y-3">
-                  <Skeleton className="h-[400px] sm:h-[450px] md:h-[500px] w-full rounded-lg" />
+                <div key={i} className="border border-foreground/10 p-4 animate-pulse">
+                  <div className="aspect-square bg-muted/50 mb-6" />
+                  <div className="h-3 bg-muted/50 w-1/3 mb-2" />
+                  <div className="h-5 bg-muted/50 w-2/3 mb-4" />
+                  <div className="h-10 bg-muted/50 mt-auto" />
                 </div>
               ))}
             </div>
           ) : filteredProducts.length > 0 ? (
             <>
-              <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-12 gap-x-8">
                 {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} showAddToEnquiry />
                 ))}
               </div>
 
-              {/* Pagination */}
+              {/* Editorial Pagination */}
               {totalPages > 1 && (
-                <div className="mt-8 sm:mt-10 md:mt-12">
-                  <Pagination>
-                    <PaginationContent className="flex-wrap gap-1">
-                      <PaginationItem>
-                        <PaginationPrevious
-                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                        />
-                      </PaginationItem>
+                <div className="mt-16 border-t border-foreground pt-10 flex justify-between items-center">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest hover:underline disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <span className="text-sm">←</span> Previous
+                  </button>
 
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                        // Show first page, last page, current page, and pages around current
-                        const showPage =
-                          page === 1 ||
-                          page === totalPages ||
-                          (page >= currentPage - 1 && page <= currentPage + 1);
+                  <div className="flex gap-4 font-black text-xs">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
 
-                        if (!showPage) {
-                          // Show ellipsis
-                          if (page === currentPage - 2 || page === currentPage + 2) {
-                            return (
-                              <PaginationItem key={page}>
-                                <PaginationEllipsis />
-                              </PaginationItem>
-                            );
-                          }
-                          return null;
-                        }
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`${currentPage === pageNum ? 'underline underline-offset-4' : 'text-foreground/40 hover:text-foreground'}`}
+                        >
+                          {String(pageNum).padStart(2, '0')}
+                        </button>
+                      );
+                    })}
+                    {totalPages > 5 && currentPage < totalPages - 2 && (
+                      <>
+                        <span className="text-foreground/40">...</span>
+                        <button
+                          onClick={() => setCurrentPage(totalPages)}
+                          className="text-foreground/40 hover:text-foreground"
+                        >
+                          {String(totalPages).padStart(2, '0')}
+                        </button>
+                      </>
+                    )}
+                  </div>
 
-                        return (
-                          <PaginationItem key={page}>
-                            <PaginationLink
-                              onClick={() => setCurrentPage(page)}
-                              isActive={currentPage === page}
-                              className="cursor-pointer"
-                            >
-                              {page}
-                            </PaginationLink>
-                          </PaginationItem>
-                        );
-                      })}
-
-                      <PaginationItem>
-                        <PaginationNext
-                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                          className={
-                            currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"
-                          }
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest hover:underline disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Next <span className="text-sm">→</span>
+                  </button>
                 </div>
               )}
             </>
           ) : (
-            <div className="py-12 sm:py-16 md:py-20 text-center">
-              <p className="text-base sm:text-lg text-muted-foreground">
-                No products found matching your criteria.
+            <div className="py-20 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+                <Search className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No products found</h3>
+              <p className="text-muted-foreground">
+                Try adjusting your filters or search terms
               </p>
             </div>
           )}
-        </main>
-
-        {/* Enquiry Cart Sidebar */}
-        <EnquiryCart />
-
-        <Footer />
         </div>
+      </main>
+
+
+
+      <Footer />
+    </div>
   );
 }
 
 export default function ProductsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
-          <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="h-[400px] sm:h-[450px] md:h-[500px] w-full rounded-lg" />
-              </div>
-            ))}
+        {/* Hero skeleton */}
+        <div className="h-64 md:h-80 bg-black/90 animate-pulse" />
+        {/* Content skeleton */}
+        <div className="flex flex-col md:flex-row px-6 md:px-16 py-10 gap-12 max-w-7xl mx-auto">
+          {/* Sidebar skeleton */}
+          <div className="hidden lg:block w-64 shrink-0">
+            <div className="h-8 bg-muted/50 w-24 mb-6" />
+            <div className="h-px bg-muted/30 mb-8" />
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="h-6 bg-muted/30 rounded" />
+              ))}
+            </div>
           </div>
-        </main>
+          {/* Products skeleton */}
+          <div className="flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-12 gap-x-8">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="border border-foreground/10 p-4 animate-pulse">
+                  <div className="aspect-square bg-muted/50 mb-6" />
+                  <div className="h-3 bg-muted/50 w-1/3 mb-2" />
+                  <div className="h-5 bg-muted/50 w-2/3 mb-4" />
+                  <div className="h-10 bg-muted/50 mt-4" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
         <Footer />
       </div>
     }>
@@ -348,4 +434,3 @@ export default function ProductsPage() {
     </Suspense>
   );
 }
-

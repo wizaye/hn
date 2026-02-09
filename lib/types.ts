@@ -28,6 +28,7 @@ export interface EnquiryItem {
   quantity: number;
   price: number;
   colorCode?: string;
+  image?: string;
 }
 
 export interface EnquiryFormData {
