@@ -146,7 +146,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
         <DialogContent className="max-w-[95vw] md:max-w-[1200px] h-[90vh] md:h-[85vh] p-0 gap-0 overflow-hidden flex flex-col rounded-md border-border shadow-2xl bg-background">
           <DialogHeader className="p-6 border-b shrink-0 flex flex-row items-center justify-between bg-muted/5 space-y-0">
             <div className="flex items-center gap-3">
-              <DialogTitle className="text-2xl font-serif font-bold tracking-tight">
+              <DialogTitle className="text-2xl font-bold tracking-tight">
                 Shopping Cart
               </DialogTitle>
               <Badge variant="secondary" className="font-mono text-xs rounded-full px-2.5 h-6 flex items-center">
@@ -192,7 +192,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                       <div className="flex-1 min-w-0 flex flex-col justify-between">
                         <div className="flex justify-between items-start gap-4">
                           <div className="space-y-1">
-                            <h4 className="font-bold text-xl text-foreground font-serif leading-tight">{item.productName}</h4>
+                            <h4 className="font-bold text-xl text-foreground leading-tight">{item.productName}</h4>
                             <div className="flex flex-wrap items-center gap-3">
                               <span className="text-xs font-mono text-muted-foreground bg-muted/30 px-1.5 py-0.5 rounded-sm border border-border/50 uppercase tracking-widest">
                                 {item.modelNumber}
@@ -246,7 +246,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                               onClick={() => handleDeleteItem(item.productId, item.variantId)}
                               className="text-sm font-medium text-muted-foreground hover:text-destructive hover:underline flex items-center gap-1.5 transition-colors"
                             >
-                              {deletingItem?.productId === item.productId && deletingItem?.variantId === item.variantId ? <Spinner size="sm" className="w-3.5 h-3.5" /> : "Remove"}
+                              {deletingItem?.productId === item.productId && deletingItem?.variantId === item.variantId ? <Spinner className="w-3.5 h-3.5" /> : "Remove"}
                             </button>
                           </div>
 
@@ -281,7 +281,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
 
                   <div className="flex justify-between items-end">
                     <span className="font-bold text-lg">Subtotal</span>
-                    <span className="font-bold text-3xl font-serif text-primary">{formatCurrency(totalValue, 'INR')}</span>
+                    <span className="font-bold text-3xl text-primary">{formatCurrency(totalValue, 'INR')}</span>
                   </div>
 
                   <div className="p-4 bg-background border rounded-sm text-sm text-muted-foreground leading-relaxed shadow-sm">
@@ -338,7 +338,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
               disabled={isClearing}
               className="bg-destructive hover:bg-destructive/90 rounded-sm"
             >
-              {isClearing ? <Spinner size="sm" className="mr-2" /> : "Empty Cart"}
+              {isClearing ? <Spinner className="mr-2" /> : "Empty Cart"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -104,7 +104,7 @@ function FilterContent({
             {/* Header - only show on desktop */}
             {showHeader && (
                 <div className="mb-8">
-                    <h2 className="font-serif text-2xl italic mb-6">Filters</h2>
+                    <h2 className="text-2xl font-bold italic mb-6">Filters</h2>
                     <div className="h-px bg-foreground w-full" />
                 </div>
             )}
@@ -248,7 +248,7 @@ export function FilterSidebarMobile(props: FilterSidebarProps) {
             </DrawerTrigger>
             <DrawerContent className="h-[75vh] flex flex-col p-0 rounded-t-2xl">
                 <DrawerHeader className="border-b px-5 py-4">
-                    <DrawerTitle className="font-serif text-xl italic">Filters</DrawerTitle>
+                    <DrawerTitle className="text-xl font-bold italic">Filters</DrawerTitle>
                     <DrawerDescription className="text-xs text-foreground/60">
                         Narrow down products by category or price
                     </DrawerDescription>

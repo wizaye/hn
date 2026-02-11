@@ -35,7 +35,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-12">
+      <main className="px-6 md:px-10 lg:px-16 py-8 sm:py-10 md:py-12">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-muted-foreground tracking-tight mb-2">
@@ -48,7 +48,7 @@ export default function ContactPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold">Personal Information</h3>
+              <h3 className="text-[11px] font-bold uppercase tracking-widest">Personal Information</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="name">Name *</Label>
@@ -108,7 +108,7 @@ export default function ContactPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
+            <Button type="submit" className="w-full cursor-pointer" size="lg">
               Submit Enquiry
             </Button>
           </form>

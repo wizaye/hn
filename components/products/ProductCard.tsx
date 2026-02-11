@@ -64,7 +64,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
 
   return (
     <>
-      <div className="group border border-foreground/10 hover:border-foreground transition-colors flex flex-col p-2 sm:p-3">
+      <div className="group border border-foreground/10 hover:border-foreground transition-colors flex flex-col p-2 sm:p-3 rounded-sm">
         {/* Product Image Section */}
         <Dialog open={isZoomOpen} onOpenChange={setIsZoomOpen}>
           <DialogTrigger asChild>
@@ -123,7 +123,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
               )}
             </div>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl w-[90vw] p-4 rounded-none">
+          <DialogContent className="max-w-3xl w-[90vw] p-4 rounded-sm">
             <div className="relative w-full aspect-square bg-muted/20">
               {currentImage?.url && (
                 <img
@@ -137,7 +137,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">
                 {getCategoryDisplayName(product.category)}
               </p>
-              <h3 className="font-serif text-2xl italic">{product.modelNumber}</h3>
+              <h3 className="text-2xl font-bold italic">{product.modelNumber}</h3>
               <p className="text-lg font-bold uppercase mt-3">{formatCurrency(displayPrice, 'INR')}</p>
             </div>
           </DialogContent>
@@ -151,7 +151,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
           </p>
 
           {/* Model Number */}
-          <h3 className="font-serif text-base sm:text-lg font-bold italic truncate">
+          <h3 className="text-base sm:text-lg font-bold italic truncate">
             {product.modelNumber}
           </h3>
 

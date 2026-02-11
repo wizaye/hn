@@ -11,14 +11,14 @@ export default function NotFound() {
 
                 {/* Horizontal 404 Alignment */}
                 <div className="flex items-center justify-center gap-4 text-foreground/90 pb-4">
-                    <span className="text-[8rem] sm:text-[10rem] font-serif font-black leading-none tracking-tighter">4</span>
+                    <span className="text-[8rem] sm:text-[10rem] font-black leading-none tracking-tighter">4</span>
 
                     {/* Static Clock Icon acting as the '0' */}
                     <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-[6px] sm:border-[8px] border-foreground/90 flex items-center justify-center relative bg-background">
                         <Clock className="w-12 h-12 sm:w-16 sm:h-16 text-foreground/90 stroke-[2.5]" />
                     </div>
 
-                    <span className="text-[8rem] sm:text-[10rem] font-serif font-black leading-none tracking-tighter">4</span>
+                    <span className="text-[8rem] sm:text-[10rem] font-black leading-none tracking-tighter">4</span>
                 </div>
 
                 <div className="space-y-4 max-w-md mx-auto">

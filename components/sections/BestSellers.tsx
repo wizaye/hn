@@ -14,7 +14,7 @@ export function BestSellers() {
   useEffect(() => {
     async function fetchBestSellers() {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch('/api/products?limit=1000');
         const data = await response.json();
 
         if (data.success) {

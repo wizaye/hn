@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, ChevronDown, ShoppingCart } from "lucide-react";
+import { ChevronDown, ShoppingCart, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   NavigationMenu,
@@ -14,13 +14,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { NoiseBackground } from "@/components/ui/noise-background";
 import { cn } from "@/lib/utils";
 import { getCategoryDisplayName } from "@/lib/product-helpers";
 import { useCartOpen } from "@/components/products/EnquiryCart";
@@ -49,11 +43,23 @@ export function Navbar() {
     fetchCategories();
   }, []);
 
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   return (
     <header className="bg-background border-border/50 dark:border-border sticky top-0 z-50 w-full border-b">
       <div className="flex h-16 items-center justify-between px-6 md:px-10 lg:px-16 w-full">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 shrink-0 min-w-0 mr-4 lg:mr-0">
+        <Link href="/" className="flex items-center gap-3 shrink-0 min-w-0 mr-4 lg:mr-0 z-50 relative">
           <Image
             src="/hn_logo.png"
             alt="Hyderabad Network"
@@ -62,7 +68,7 @@ export function Navbar() {
             className="size-10 object-contain"
             priority
           />
-          <span className="text-lg font-bold font-serif truncate">
+          <span className="text-sm md:text-lg font-bold truncate">
             Hyderabad Network
           </span>
         </Link>
@@ -71,7 +77,7 @@ export function Navbar() {
         <NavigationMenu className="hidden lg:flex ml-6">
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="font-serif">Products</NavigationMenuTrigger>
+              <NavigationMenuTrigger>Products</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <div className="grid gap-0.5 p-2 w-[240px]">
                   <NavigationMenuLink asChild>
@@ -79,7 +85,7 @@ export function Navbar() {
                       href="/products"
                       className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     >
-                      <div className="text-sm font-medium leading-none font-serif">All Categories</div>
+                      <div className="text-sm font-medium leading-none">All Categories</div>
                       <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
                         Browse our complete catalog
                       </p>
@@ -91,7 +97,7 @@ export function Navbar() {
                         href={`/products?category=${category}`}
                         className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       >
-                        <div className="text-sm font-medium leading-none font-serif">
+                        <div className="text-sm font-medium leading-none">
                           {getCategoryDisplayName(category)}
                         </div>
                         <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
@@ -105,14 +111,14 @@ export function Navbar() {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/#custom-work" className="font-serif">
+                <Link href="/#custom-work">
                   Custom Work
                 </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/contact" className="font-serif">
+                <Link href="/contact">
                   Contact
                 </Link>
               </NavigationMenuLink>
@@ -125,7 +131,7 @@ export function Navbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="hidden lg:flex relative"
+            className="relative"
             onClick={() => setIsCartOpen(true)}
           >
             <ShoppingCart className="h-5 w-5" />
@@ -136,128 +142,120 @@ export function Navbar() {
             )}
           </Button>
 
-          <NoiseBackground
-            containerClassName="hidden lg:block p-1 rounded-full"
-            gradientColors={[
-              "rgb(255, 100, 150)",
-              "rgb(100, 150, 255)",
-              "rgb(255, 200, 100)",
-            ]}
+          <Link
+            href="/enquire"
+            className="hidden lg:flex h-10 items-center justify-center rounded-full bg-black px-6 text-xs font-bold text-white shadow-sm transition-all duration-200 active:scale-[0.98] hover:bg-black/80 uppercase tracking-wider"
           >
-            <Link
-              href="/enquire"
-              className="flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-neutral-100 via-neutral-100 to-white px-6 py-2 text-xs font-bold font-serif text-black shadow-sm transition-all duration-200 active:scale-[0.98] hover:shadow-md uppercase tracking-wider"
-            >
-              Enquire Now
-            </Link>
-          </NoiseBackground>
+            Enquire Now
+          </Link>
         </div>
 
-        {/* Mobile - Menu Button on Right */}
-        <div className="flex lg:hidden items-center">
-          <Button
-            variant="ghost"
-            className="h-8 w-8 px-0 hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 items-center justify-center gap-2.5"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            <div className="relative flex h-8 w-4 items-center justify-center">
-              <div className="relative size-4">
-                <span className={cn(
-                  "bg-foreground absolute left-0 block h-0.5 w-4 transition-all duration-100",
-                  isOpen ? "top-2 rotate-45" : "top-1"
-                )} />
-                <span className={cn(
-                  "bg-foreground absolute left-0 block h-0.5 w-4 transition-all duration-100",
-                  isOpen ? "opacity-0" : "top-2.5 opacity-100"
-                )} />
-                <span className={cn(
-                  "bg-foreground absolute left-0 block h-0.5 w-4 transition-all duration-100",
-                  isOpen ? "top-2 -rotate-45" : "top-4"
-                )} />
-              </div>
-            </div>
-            <span className="sr-only">Toggle Menu</span>
-          </Button>
-        </div>
+        {/* Mobile - Menu Button on Right (Black Box) */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="lg:hidden ml-4 z-50 flex flex-col items-center justify-center gap-[5px] active:scale-95 transition-all cursor-pointer relative p-2"
+          aria-label="Toggle Menu"
+        >
+          {isOpen ? (
+            <X className="size-6 text-black" strokeWidth={2.5} />
+          ) : (
+            <>
+              <div className="w-5 h-[2px] bg-black rounded-full" />
+              <div className="w-5 h-[2px] bg-black rounded-full" />
+            </>
+          )}
+        </button>
       </div>
 
-      {/* Mobile Menu Dropdown - Overlays content */}
+      {/* Mobile Menu Dropdown - Full Screen Overlay */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 z-50 border-b rounded-b-xl bg-background lg:hidden shadow-lg"
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="absolute top-full left-0 right-0 z-40 bg-white flex flex-col p-6 shadow-2xl overflow-y-auto overflow-x-hidden max-w-[100vw] lg:hidden border-t border-black/5"
+            style={{ height: 'calc(100vh - 64px)' }}
           >
-            <nav className="container mx-auto px-4 py-4 space-y-1">
-              {/* Products Collapsible */}
-              <Collapsible open={isProductsOpen} onOpenChange={setIsProductsOpen}>
-                <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent text-left">
+            <div className="flex flex-col gap-6 mt-4">
+              <Link
+                href="/"
+                onClick={() => setIsOpen(false)}
+                className="text-2xl font-bold text-black hover:text-[#C2F13C] transition-colors border-b border-black/10 pb-4"
+              >
+                Home
+              </Link>
+
+              {/* Products Accordion */}
+              <div className="border-b border-black/10 pb-4">
+                <button
+                  onClick={() => setIsProductsOpen(!isProductsOpen)}
+                  className="flex w-full items-center justify-between text-2xl font-bold text-black hover:text-[#C2F13C] transition-colors"
+                >
                   <span>Products</span>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-6 w-6 transition-transform duration-200",
                       isProductsOpen && "rotate-180"
                     )}
                   />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-0.5 pt-1 pb-2 pl-4">
-                  <Link
-                    href="/products"
-                    className="flex items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    All Categories
-                  </Link>
-                  {categories.map((category) => (
-                    <Link
-                      key={category}
-                      href={`/products?category=${category}`}
-                      className="flex items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-                      onClick={() => setIsOpen(false)}
+                </button>
+                <AnimatePresence>
+                  {isProductsOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
                     >
-                      {getCategoryDisplayName(category)}
-                    </Link>
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
+                      <div className="flex flex-col gap-4 pl-4 pt-4 pb-2">
+                        <Link
+                          href="/products"
+                          className="text-lg font-medium text-black/70 hover:text-black transition-colors"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          All Categories
+                        </Link>
+                        {categories.map((category) => (
+                          <Link
+                            key={category}
+                            href={`/products?category=${category}`}
+                            className="text-lg font-medium text-black/70 hover:text-black transition-colors"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {getCategoryDisplayName(category)}
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
               <Link
                 href="/#custom-work"
-                className="flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
                 onClick={() => setIsOpen(false)}
+                className="text-2xl font-bold text-black hover:text-[#C2F13C] transition-colors border-b border-black/10 pb-4"
               >
                 Custom Work
               </Link>
               <Link
                 href="/contact"
-                className="flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
                 onClick={() => setIsOpen(false)}
+                className="text-2xl font-bold text-black hover:text-[#C2F13C] transition-colors border-b border-black/10 pb-4"
               >
                 Contact
               </Link>
 
-              <div className="pt-3 mt-3 border-t">
-                <NoiseBackground
-                  containerClassName="w-full p-1 rounded-full"
-                  gradientColors={[
-                    "rgb(255, 100, 150)",
-                    "rgb(100, 150, 255)",
-                    "rgb(255, 200, 100)",
-                  ]}
-                >
-                  <Link
-                    href="/enquire"
-                    onClick={() => setIsOpen(false)}
-                    className="flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-neutral-100 via-neutral-100 to-white px-6 py-2.5 text-sm font-medium text-black shadow-[0px_2px_0px_0px_rgb(245,245,245)_inset,0px_0.5px_1px_0px_rgb(163,163,163)] transition-all duration-100 active:scale-[0.98] dark:from-black dark:via-black dark:to-neutral-900 dark:text-white dark:shadow-[0px_1px_0px_0px_rgb(10,10,10)_inset,0px_1px_0px_0px_rgb(38,38,38)] hover:shadow-md"
-                  >
-                    Enquire Now &rarr;
-                  </Link>
-                </NoiseBackground>
-              </div>
-            </nav>
+              <Link
+                href="/enquire"
+                onClick={() => setIsOpen(false)}
+                className="text-2xl text-black hover:text-black/70 transition-colors pb-4 font-bold"
+              >
+                Enquire Now &rarr;
+              </Link>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

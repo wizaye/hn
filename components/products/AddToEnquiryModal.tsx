@@ -145,12 +145,12 @@ export function AddToEnquiryModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto rounded-none border-2 border-foreground">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto rounded-sm border-2 border-foreground">
         <DialogHeader className="space-y-4">
           <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/60">
             Manage Enquiry
           </div>
-          <DialogTitle className="font-serif text-2xl italic tracking-wide">
+          <DialogTitle className="text-2xl font-bold italic tracking-wide">
             {product.modelNumber}
           </DialogTitle>
           <DialogDescription className="text-[11px] uppercase tracking-widest text-foreground/60">

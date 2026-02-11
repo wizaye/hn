@@ -36,7 +36,7 @@ export default function RootLayout({
             <SaleBanner />
             <EnquiryCart />
             {children}
-            <Toaster position="top-right" />
+            <Toaster position="bottom-right" />
           </CartOpenProvider>
         </EnquiryCartProvider>
       </body>

@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
-import { products } from "@/lib/data";
 import { toast } from "sonner";
 import Link from "next/link";
 import { ShoppingCart, Edit } from "lucide-react";
@@ -39,7 +38,7 @@ function GeneralEnquiryForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
-        <h3 className="text-xl font-semibold">Personal Information</h3>
+        <h3 className="text-[11px] font-bold uppercase tracking-widest">Personal Information</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
@@ -166,10 +165,10 @@ function DetailedProductEnquiryForm() {
         });
         clearCart();
         setNeedsCustomization(false);
-        
+
         // Show success screen
         setShowSuccess(true);
-        
+
         // Start countdown timer
         const interval = setInterval(() => {
           setRedirectTimer((prev) => {
@@ -203,7 +202,7 @@ function DetailedProductEnquiryForm() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          
+
           {/* Success Message */}
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-green-900 dark:text-green-100">Enquiry Submitted!</h2>
@@ -211,7 +210,7 @@ function DetailedProductEnquiryForm() {
               Thank you for your enquiry. We've sent a confirmation email with all the details.
             </p>
           </div>
-          
+
           {/* Timer */}
           <div className="space-y-3">
             <div className="flex items-center justify-center gap-2 text-sm text-green-600 dark:text-green-400">
@@ -220,7 +219,7 @@ function DetailedProductEnquiryForm() {
               </svg>
               <span>Redirecting to home in {redirectTimer} seconds...</span>
             </div>
-            
+
             <Button
               onClick={() => window.location.href = '/'}
               className="w-full bg-green-600 hover:bg-green-700"
@@ -229,7 +228,7 @@ function DetailedProductEnquiryForm() {
               Go to Home Now
             </Button>
           </div>
-          
+
           {/* What's Next */}
           <div className="pt-4 border-t border-green-200 dark:border-green-800 text-sm text-left space-y-2">
             <p className="font-semibold text-green-900 dark:text-green-100">What happens next?</p>
@@ -257,7 +256,7 @@ function DetailedProductEnquiryForm() {
     <>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Personal Information</h3>
+          <h3 className="text-[11px] font-bold uppercase tracking-widest">Personal Information</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Name *</Label>
@@ -309,7 +308,7 @@ function DetailedProductEnquiryForm() {
         {/* Products Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold">Products</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-widest">Products</h3>
             {items.length > 0 && (
               <Button
                 type="button"
@@ -346,23 +345,22 @@ function DetailedProductEnquiryForm() {
                 </thead>
                 <tbody className="divide-y">
                   {items.map((item, idx) => {
-                    const product = products.find((p) => p.id === item.productId);
-                    const variant = product?.variants.find((v) => v.id === item.variantId);
+                    const variantColor = item.colorCode;
                     return (
                       <tr key={`${item.productId}-${item.variantId}-${idx}`} className="hover:bg-muted/30">
                         <td className="py-3 px-4">
-                          <div className="font-medium">{product?.name || "Product"}</div>
+                          <div className="font-medium">{item.productName}</div>
                           <div className="text-xs text-muted-foreground sm:hidden">{item.variantName}</div>
-                          {product?.modelNumber && (
-                            <div className="text-xs text-muted-foreground font-mono">{product.modelNumber}</div>
+                          {item.modelNumber && (
+                            <div className="text-xs text-muted-foreground font-mono">{item.modelNumber}</div>
                           )}
                         </td>
                         <td className="py-3 px-4 hidden sm:table-cell">
                           <div className="flex items-center gap-2">
-                            {variant?.color && (
+                            {variantColor && (
                               <div
                                 className="h-3 w-3 rounded-full border flex-shrink-0"
-                                style={{ backgroundColor: variant.colorCode || "#000" }}
+                                style={{ backgroundColor: variantColor || "#000" }}
                               />
                             )}
                             <span>{item.variantName}</span>
@@ -387,8 +385,8 @@ function DetailedProductEnquiryForm() {
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Order Details</h3>
-          
+          <h3 className="text-[11px] font-bold uppercase tracking-widest">Order Details</h3>
+
           <div className="space-y-2">
             <Label htmlFor="deliveryTimeline">Delivery Timeline *</Label>
             <select
@@ -424,7 +422,7 @@ function DetailedProductEnquiryForm() {
                 Is customization needed?
               </Label>
             </div>
-            
+
             {needsCustomization && (
               <div className="space-y-2 pl-6">
                 <Label htmlFor="customizationNotes">Customization Details *</Label>
@@ -453,7 +451,7 @@ export default function EnquirePage() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-12">
+      <main className="px-6 md:px-10 lg:px-16 py-8 sm:py-10 md:py-12">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-muted-foreground tracking-tight mb-2">

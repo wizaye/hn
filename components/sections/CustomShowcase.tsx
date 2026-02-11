@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { NoiseBackground } from "@/components/ui/noise-background";
+import { CustomWorkCard } from "@/components/sections/CustomWorkCard";
 import { Marquee } from "@/components/ui/marquee";
 
 const showcaseItems = [
@@ -50,14 +49,8 @@ const showcaseItems = [
 ];
 
 export function CustomShowcase() {
-  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
-
-  const handleImageError = (idx: number) => {
-    setImageErrors(prev => ({ ...prev, [idx]: true }));
-  };
-
   return (
-    <section id="custom-work" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-background">
+    <section id="custom-work" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-background overflow-hidden w-full max-w-[100vw]">
       <div className="container mx-auto px-4 sm:px-6 md:px-8 max-w-7xl">
         <div className="mb-8 sm:mb-10 md:mb-12 text-center">
           <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-muted-foreground tracking-tight">
@@ -70,62 +63,19 @@ export function CustomShowcase() {
 
         <div className="relative">
           {/* Left fade */}
-          <div className="absolute left-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
 
           {/* Right fade */}
-          <div className="absolute right-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
 
           <Marquee pauseOnHover className="[--duration:40s]">
             {showcaseItems.map((item, idx) => (
-              <div key={idx} className="mx-2 w-[280px] sm:w-[320px]">
-                <NoiseBackground
-                  gradientColors={item.gradient}
-                  className="h-full"
-                >
-                  <div className="flex h-[380px] sm:h-[400px] flex-col overflow-hidden rounded-lg bg-white text-center dark:bg-neutral-800">
-                    {/* Icon/Image Section */}
-                    <div className="relative h-48 sm:h-52 w-full overflow-hidden">
-                      {item.image && !imageErrors[idx] ? (
-                        <>
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="h-full w-full object-contain p-4"
-                            onError={() => handleImageError(idx)}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                        </>
-                      ) : (
-                        <>
-                          <div className="h-full w-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5" />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-5xl sm:text-6xl">🕐</span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Content Section */}
-                    <div className="flex flex-1 flex-col px-3 sm:px-4 py-3 sm:py-4 min-h-0">
-                      <div className="flex-1 flex flex-col justify-between min-h-0">
-                        {/* Title */}
-                        <h3 className="text-base sm:text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-2 line-clamp-2">
-                          {item.title}
-                        </h3>
-
-                        {/* Description */}
-                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 mb-3">
-                          {item.description}
-                        </p>
-
-                        {/* Action Tag */}
-                        <div className="text-xs font-medium text-primary">
-                          Learn More →
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </NoiseBackground>
+              <div key={idx} className="mx-3 w-[240px] sm:w-[280px] h-full">
+                <CustomWorkCard
+                  title={item.title}
+                  description={item.description}
+                  image={item.image}
+                />
               </div>
             ))}
           </Marquee>

@@ -25,7 +25,7 @@ interface CustomerEnquiryData {
  */
 export function getCustomerConfirmationEmail(data: CustomerEnquiryData) {
   const totalItems = data.items.reduce((sum, item) => sum + item.quantity, 0);
-  
+
   return {
     subject: `Enquiry Received - ${data.companyName} | Hyderabad Network`,
     html: `
@@ -36,7 +36,7 @@ export function getCustomerConfirmationEmail(data: CustomerEnquiryData) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Enquiry Confirmation</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffffff;">
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #ffffff;">
   <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #ffffff;">
     
     <!-- Header -->
@@ -158,11 +158,17 @@ export function getCustomerConfirmationEmail(data: CustomerEnquiryData) {
     
     <!-- Footer -->
     <tr>
-      <td style="padding: 30px; background-color: #f9f9f9; border-top: 1px solid #e0e0e0;">
-        <p style="margin: 0 0 8px; color: #666666; font-size: 13px; text-align: center;">
+      <td style="padding: 30px; background-color: #000000; border-top: 1px solid #e0e0e0;">
+        <p style="margin: 0 0 12px; color: #ffffff; font-size: 14px; font-weight: 700; text-align: center; letter-spacing: 1px;">
+          HYDERABAD NETWORK
+        </p>
+        <p style="margin: 0 0 8px; color: #cccccc; font-size: 12px; text-align: center;">
+          Premium Clock Manufacturer
+        </p>
+        <p style="margin: 0 0 8px; color: #cccccc; font-size: 12px; text-align: center;">
           Email: info@hyderabadnetwork.com | Phone: +91 XXX XXX XXXX
         </p>
-        <p style="margin: 0; color: #999999; font-size: 12px; text-align: center;">
+        <p style="margin: 0; color: #999999; font-size: 11px; text-align: center;">
           © ${new Date().getFullYear()} Hyderabad Network. All rights reserved.
         </p>
       </td>
@@ -209,7 +215,7 @@ Phone: +91 XXX XXX XXXX
 export function getAdminNotificationEmail(data: CustomerEnquiryData, enquiryId: number) {
   const totalItems = data.items.reduce((sum, item) => sum + item.quantity, 0);
   const estimatedValue = data.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
+
   return {
     subject: `New B2B Enquiry #${enquiryId} - ${data.companyName}`,
     html: `
@@ -220,7 +226,7 @@ export function getAdminNotificationEmail(data: CustomerEnquiryData, enquiryId: 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>New Enquiry Notification</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffffff;">
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #ffffff;">
   <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #ffffff;">
     
     <!-- Header -->
@@ -394,9 +400,12 @@ export function getAdminNotificationEmail(data: CustomerEnquiryData, enquiryId: 
     
     <!-- Footer -->
     <tr>
-      <td style="padding: 30px; background-color: #f9f9f9; border-top: 1px solid #e0e0e0;">
-        <p style="margin: 0; color: #666666; font-size: 12px; text-align: center;">
-          Automated notification from Hyderabad Network B2B System
+      <td style="padding: 30px; background-color: #000000; border-top: 1px solid #e0e0e0;">
+        <p style="margin: 0 0 8px; color: #ffffff; font-size: 14px; font-weight: 700; text-align: center; letter-spacing: 1px;">
+          HYDERABAD NETWORK — B2B SYSTEM
+        </p>
+        <p style="margin: 0; color: #999999; font-size: 11px; text-align: center;">
+          Automated notification &bull; ${new Date().getFullYear()}
         </p>
       </td>
     </tr>
