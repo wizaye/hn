@@ -42,11 +42,14 @@ export function FramerCarousel({
 
   const paginate = useCallback(
     (newDirection: number) => {
-      const newIndex =
-        (currentIndex + newDirection + images.length) % images.length;
-      setCurrentIndex([newIndex, newDirection]);
+      setCurrentIndex((prev) => {
+        const [prevIndex] = prev;
+        const newIndex =
+          (prevIndex + newDirection + images.length) % images.length;
+        return [newIndex, newDirection];
+      });
     },
-    [currentIndex, images.length]
+    [images.length]
   );
 
   // Autoplay
@@ -56,7 +59,7 @@ export function FramerCarousel({
     }, autoplayInterval);
 
     return () => clearInterval(timer);
-  }, [currentIndex, autoplayInterval, paginate]);
+  }, [autoplayInterval, paginate]);
 
   return (
     <div className={`relative overflow-hidden rounded-lg ${className}`}>
@@ -121,11 +124,10 @@ export function FramerCarousel({
             onClick={() =>
               setCurrentIndex([index, index > currentIndex ? 1 : -1])
             }
-            className={`h-1.5 sm:h-2 rounded-full transition-all ${
-              index === currentIndex
+            className={`h-1.5 sm:h-2 rounded-full transition-all ${index === currentIndex
                 ? "w-6 sm:w-8 bg-white"
                 : "w-1.5 sm:w-2 bg-white/50 hover:bg-white/75"
-            }`}
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}

@@ -26,7 +26,7 @@ export function Hero() {
       {/* Content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center container mx-auto px-4 sm:px-6 md:px-8 max-w-5xl text-center text-white">
         <p className="mb-4 text-sm font-medium uppercase tracking-widest text-white/70">
-          Hyderabad Networks
+          Hyderabad Network
         </p>
         <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
           Premium Corporate
@@ -36,7 +36,7 @@ export function Hero() {
           </span>
         </h1>
         <p className="mb-10 max-w-2xl text-lg text-white/80 sm:text-xl">
-          Custom branding • Competitive bulk pricing • Trusted by 500+ enterprises
+          Custom branding • Competitive bulk pricing
         </p>
         <div className="flex flex-col gap-4 sm:flex-row">
           <Button

@@ -195,7 +195,7 @@ function DetailedProductEnquiryForm() {
   if (showSuccess) {
     return (
       <div className="max-w-md mx-auto">
-        <div className="rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-8 text-center space-y-6">
+        <div className="rounded-sm border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-8 text-center space-y-6">
           {/* Success Icon */}
           <div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
             <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +222,7 @@ function DetailedProductEnquiryForm() {
 
             <Button
               onClick={() => window.location.href = '/'}
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-green-600 hover:bg-green-700 cursor-pointer"
               size="lg"
             >
               Go to Home Now
@@ -394,7 +394,7 @@ function DetailedProductEnquiryForm() {
               required
               value={formData.deliveryTimeline}
               onChange={(e) => setFormData({ ...formData, deliveryTimeline: e.target.value })}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             >
               <option value="urgent">Urgent (within 1 week)</option>
               <option value="1-2 weeks">1-2 weeks</option>
@@ -416,7 +416,7 @@ function DetailedProductEnquiryForm() {
                     setFormData({ ...formData, customizationNotes: "" });
                   }
                 }}
-                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary"
+                className="h-4 w-4 rounded-sm border-gray-300 text-primary focus:ring-2 focus:ring-primary cursor-pointer"
               />
               <Label htmlFor="needsCustomization" className="font-medium cursor-pointer">
                 Is customization needed?
@@ -439,7 +439,7 @@ function DetailedProductEnquiryForm() {
           </div>
         </div>
 
-        <Button type="submit" className="w-full" size="lg" disabled={items.length === 0 || isSubmitting}>
+        <Button type="submit" className="w-full cursor-pointer" size="lg" disabled={items.length === 0 || isSubmitting}>
           {isSubmitting ? "Submitting..." : "Submit Enquiry"}
         </Button>
       </form>

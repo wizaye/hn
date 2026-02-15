@@ -33,9 +33,9 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="px-6 md:px-10 lg:px-16 py-8 sm:py-10 md:py-12">
+      <main className="px-6 md:px-10 lg:px-16 py-8 sm:py-10 md:py-12 flex-1">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-muted-foreground tracking-tight mb-2">

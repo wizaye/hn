@@ -137,7 +137,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">
                 {getCategoryDisplayName(product.category)}
               </p>
-              <h3 className="text-2xl font-bold italic">{product.modelNumber}</h3>
+              <h3 className="text-2xl font-bold">{product.modelNumber}</h3>
               <p className="text-lg font-bold uppercase mt-3">{formatCurrency(displayPrice, 'INR')}</p>
             </div>
           </DialogContent>
@@ -151,7 +151,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
           </p>
 
           {/* Model Number */}
-          <h3 className="text-base sm:text-lg font-bold italic truncate">
+          <h3 className="text-base sm:text-lg font-bold truncate">
             {product.modelNumber}
           </h3>
 
@@ -183,7 +183,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
                 {!mounted ? (
                   <button
                     disabled
-                    className="w-full bg-foreground/50 text-background py-2 sm:py-3 text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em]"
+                    className="w-full bg-foreground/50 text-background py-2 sm:py-3 text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em] cursor-not-allowed"
                   >
                     Loading...
                   </button>
@@ -191,14 +191,14 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
                   <div className="flex gap-2">
                     <button
                       onClick={() => setIsModalOpen(true)}
-                      className="flex-1 bg-foreground text-background py-2 sm:py-3 text-[9px] sm:text-[11px] font-black uppercase tracking-[0.15em] hover:bg-background hover:text-foreground border border-foreground transition-all flex items-center justify-center gap-2"
+                      className="flex-1 bg-foreground text-background py-2 sm:py-3 text-[9px] sm:text-[11px] font-black uppercase tracking-[0.15em] hover:bg-background hover:text-foreground border border-foreground transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Edit className="h-3 w-3" />
                       Edit
                     </button>
                     <button
                       onClick={handleRemoveAll}
-                      className="px-3 sm:px-4 border border-foreground text-foreground py-2 sm:py-3 hover:bg-red-600 hover:border-red-600 hover:text-white transition-all"
+                      className="px-3 sm:px-4 border border-foreground text-foreground py-2 sm:py-3 hover:bg-red-600 hover:border-red-600 hover:text-white transition-all cursor-pointer"
                     >
                       <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </button>
@@ -206,7 +206,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
                 ) : (
                   <button
                     onClick={() => setIsModalOpen(true)}
-                    className="w-full bg-foreground text-background py-2 sm:py-3 text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em] hover:bg-background hover:text-foreground border border-foreground transition-all"
+                    className="w-full bg-foreground text-background py-2 sm:py-3 text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em] hover:bg-background hover:text-foreground border border-foreground transition-all cursor-pointer"
                   >
                     Add to Enquiry
                   </button>

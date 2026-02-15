@@ -145,12 +145,12 @@ export function AddToEnquiryModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto rounded-sm border-2 border-foreground">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto rounded-sm border border-border">
         <DialogHeader className="space-y-4">
           <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/60">
             Manage Enquiry
           </div>
-          <DialogTitle className="text-2xl font-bold italic tracking-wide">
+          <DialogTitle className="text-2xl font-bold tracking-wide">
             {product.modelNumber}
           </DialogTitle>
           <DialogDescription className="text-[11px] uppercase tracking-widest text-foreground/60">
@@ -165,7 +165,7 @@ export function AddToEnquiryModal({
                 <label className="text-[10px] font-bold uppercase tracking-[0.2em]">
                   Current Variants in Enquiry
                 </label>
-                <div className="border border-foreground divide-y divide-foreground">
+                <div className="border border-border rounded-sm divide-y divide-border">
                   {cartItems.map((item) => {
                     const variant = allVariants.find((v: any) => v.id === item.variantId);
                     return (
@@ -176,7 +176,7 @@ export function AddToEnquiryModal({
                         <div className="flex items-center gap-3">
                           {variant?.color && (
                             <div
-                              className="h-4 w-4 border border-foreground"
+                              className="h-4 w-4 rounded-sm border border-border"
                               style={{
                                 backgroundColor: variant.colorCode || "#000",
                               }}
@@ -194,7 +194,7 @@ export function AddToEnquiryModal({
                             onClick={() => handleEditVariant(item.variantId)}
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 rounded-none hover:bg-foreground hover:text-background"
+                            className="h-8 w-8 p-0 rounded-sm hover:bg-foreground hover:text-background cursor-pointer"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -202,7 +202,7 @@ export function AddToEnquiryModal({
                             onClick={() => handleDeleteVariant(item.variantId)}
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 rounded-none hover:bg-red-600 hover:text-white"
+                            className="h-8 w-8 p-0 rounded-sm hover:bg-red-600 hover:text-white cursor-pointer"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -212,7 +212,7 @@ export function AddToEnquiryModal({
                   })}
                 </div>
               </div>
-              <Separator className="bg-foreground" />
+              <Separator className="bg-border" />
             </>
           )}
 
@@ -227,12 +227,12 @@ export function AddToEnquiryModal({
                 Variant (Color)
               </label>
               <Select value={selectedVariant} onValueChange={setSelectedVariant}>
-                <SelectTrigger id="variant" className="rounded-none border-foreground focus:ring-0">
+                <SelectTrigger id="variant" className="rounded-sm border-border focus:ring-0 w-full">
                   <SelectValue placeholder="Select variant" />
                 </SelectTrigger>
-                <SelectContent className="rounded-none border-foreground">
+                <SelectContent className="rounded-sm border-border">
                   {allVariants.map((variant: any) => (
-                    <SelectItem key={variant.id} value={variant.id} className="rounded-none">
+                    <SelectItem key={variant.id} value={variant.id} className="rounded-sm">
                       {variant.color ? `${variant.color} - ${formatCurrency(variant.price, 'INR')}` : `${variant.name} - ${formatCurrency(variant.price, 'INR')}`}
                     </SelectItem>
                   ))}
@@ -260,19 +260,19 @@ export function AddToEnquiryModal({
                     setQuantity("1");
                   }
                 }}
-                className="rounded-none border-foreground focus:ring-0"
+                className="rounded-sm border-border focus:ring-0"
               />
             </div>
 
             {selectedVariantData && (
-              <div className="border border-foreground p-4 bg-muted/30">
+              <div className="border border-border rounded-sm p-4 bg-muted/30">
                 <div className="text-[11px] uppercase tracking-widest space-y-2">
                   <div className="flex justify-between">
                     <span className="text-foreground/60">Price per unit</span>
                     <span className="font-bold">{formatCurrency(selectedVariantData.price, 'INR')}</span>
                   </div>
-                  <div className="flex justify-between border-t border-foreground/20 pt-2">
-                    <span className="text-foreground/60">Total</span>
+                  <div className="flex justify-between border-t border-border pt-2">
+                    <span className="text-foreground/60">{parseInt(quantity) || 1} × {formatCurrency(selectedVariantData.price, 'INR')}</span>
                     <span className="font-black text-base">
                       {formatCurrency(selectedVariantData.price * (parseInt(quantity) || 1), 'INR')}
                     </span>
@@ -284,7 +284,7 @@ export function AddToEnquiryModal({
             <Button
               onClick={handleUpdateCart}
               disabled={isLoading}
-              className="w-full rounded-none bg-foreground text-background hover:bg-foreground/90 h-12 text-[11px] font-black uppercase tracking-widest"
+              className="w-full rounded-sm bg-foreground text-background hover:bg-foreground/90 h-12 text-[11px] font-black uppercase tracking-widest cursor-pointer"
             >
               {isLoading ? (
                 <>

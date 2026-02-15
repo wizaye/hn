@@ -58,13 +58,13 @@ export function BestSellers() {
         </div>
 
         {isLoading ? (
-          <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-4 sm:gap-5 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
             {Array.from({ length: 8 }).map((_, i) => (
               <Skeleton key={i} className="h-[500px] w-full rounded-lg" />
             ))}
           </div>
         ) : (
-          <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-4 sm:gap-5 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
             {products.map((product, index) => (
               <ProductCard key={product.id || index} product={product} showAddToEnquiry />
             ))}

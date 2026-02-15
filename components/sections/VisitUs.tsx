@@ -59,11 +59,11 @@ const contactInfo = [
     title: "BUSINESS HOURS",
     content: (
       <div className="flex flex-col gap-1 text-sm font-medium w-full max-w-[300px]">
-        <div className="flex justify-between">
+        <div className="grid grid-cols-[80px_1fr]">
           <span>Mon - Sat:</span>
           <span>11:00 AM - 9:00 PM</span>
         </div>
-        <div className="flex justify-between">
+        <div className="grid grid-cols-[80px_1fr]">
           <span>Sunday:</span>
           <span>Closed</span>
         </div>
@@ -74,24 +74,9 @@ const contactInfo = [
 
 const socialLinks = [
   {
-    icon: FacebookIcon,
-    href: "#",
-    label: "Facebook",
-  },
-  {
     icon: InstagramIcon,
     href: "https://www.instagram.com/hyderabad_network?igsh=eDlnbzlmNmN4Y3Fw",
     label: "Instagram",
-  },
-  {
-    icon: TwitterIcon,
-    href: "#",
-    label: "Twitter",
-  },
-  {
-    icon: LinkedInIcon,
-    href: "#",
-    label: "LinkedIn",
   },
 ];
 
@@ -127,7 +112,7 @@ function Box({ title, content, className, href, icon: Icon }: ContactBoxProps) {
         target={href.startsWith("http") ? "_blank" : undefined}
         rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
         className={cn(
-          "bg-background rounded-xl border shadow-sm hover:shadow-md transition-shadow",
+          "bg-background rounded-sm border hover:border-foreground/20 transition-colors",
           className
         )}
       >
@@ -137,7 +122,7 @@ function Box({ title, content, className, href, icon: Icon }: ContactBoxProps) {
   }
 
   return (
-    <div className={cn("bg-background rounded-xl border shadow-sm", className)}>
+    <div className={cn("bg-background rounded-sm border", className)}>
       {innerContent}
     </div>
   );
@@ -194,7 +179,7 @@ export function VisitUs() {
           </div>
 
           {/* Right side - Map */}
-          <div className="rounded-xl overflow-hidden border bg-muted h-[400px] lg:h-full lg:min-h-[600px] shadow-sm">
+          <div className="rounded-sm overflow-hidden border bg-muted h-[400px] lg:h-full lg:min-h-[600px]">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60903.118215580835!2d78.44015556953127!3d17.438407935443735!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb977d612c6e45%3A0xc314db2fe6da506f!2sHyderabad%20Network%20(Authorised%20Distributor%20for%20Ajanta%20%26%20Orpat%20Group)!5e0!3m2!1sen!2sin!4v1769278199509!5m2!1sen!2sin"
               width="100%"

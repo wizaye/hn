@@ -104,7 +104,7 @@ function FilterContent({
             {/* Header - only show on desktop */}
             {showHeader && (
                 <div className="mb-8">
-                    <h2 className="text-2xl font-bold italic mb-6">Filters</h2>
+                    <h2 className="text-2xl font-bold mb-6">Filters</h2>
                     <div className="h-px bg-foreground w-full" />
                 </div>
             )}
@@ -130,7 +130,7 @@ function FilterContent({
                                 <Checkbox
                                     checked={selectedFilters.categories.includes(category)}
                                     onCheckedChange={() => handleCategoryToggle(category)}
-                                    className="rounded-none border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background"
+                                    className="rounded-sm border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background"
                                 />
                                 <span className="text-sm font-medium uppercase tracking-tight group-hover:underline">
                                     {getCategoryDisplayName(category)}
@@ -180,14 +180,14 @@ function FilterContent({
                         <div className="flex gap-2">
                             <button
                                 onClick={handlePriceApply}
-                                className="flex-1 bg-foreground text-background py-2 text-[10px] font-bold uppercase tracking-wide hover:bg-foreground/90 transition-colors"
+                                className="flex-1 bg-foreground text-background py-2 text-[10px] font-bold uppercase tracking-wide hover:bg-foreground/90 transition-colors cursor-pointer rounded-sm"
                             >
                                 Apply
                             </button>
                             {selectedFilters.priceRange && (
                                 <button
                                     onClick={handlePriceClear}
-                                    className="px-4 border border-foreground/30 text-[10px] font-bold uppercase tracking-wide hover:bg-foreground/10 transition-colors"
+                                    className="px-4 border border-foreground/30 text-[10px] font-bold uppercase tracking-wide hover:bg-foreground/10 transition-colors cursor-pointer rounded-sm"
                                 >
                                     Clear
                                 </button>
@@ -206,7 +206,7 @@ function FilterContent({
             {activeFilterCount > 0 && (
                 <button
                     onClick={clearAllFilters}
-                    className="w-full border border-foreground py-3 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-foreground hover:text-background transition-colors"
+                    className="w-full border border-foreground py-3 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-foreground hover:text-background transition-colors cursor-pointer rounded-sm"
                 >
                     Clear All Filters
                 </button>
@@ -246,9 +246,9 @@ export function FilterSidebarMobile(props: FilterSidebarProps) {
                     )}
                 </button>
             </DrawerTrigger>
-            <DrawerContent className="h-[75vh] flex flex-col p-0 rounded-t-2xl">
+            <DrawerContent className="h-[75vh] flex flex-col p-0 rounded-t-lg">
                 <DrawerHeader className="border-b px-5 py-4">
-                    <DrawerTitle className="text-xl font-bold italic">Filters</DrawerTitle>
+                    <DrawerTitle className="text-xl font-bold">Filters</DrawerTitle>
                     <DrawerDescription className="text-xs text-foreground/60">
                         Narrow down products by category or price
                     </DrawerDescription>
@@ -260,7 +260,7 @@ export function FilterSidebarMobile(props: FilterSidebarProps) {
 
                 <div className="border-t px-5 py-4 bg-background">
                     <DrawerClose asChild>
-                        <button className="w-full bg-foreground text-background py-3 text-[11px] font-bold uppercase tracking-widest hover:bg-foreground/90 transition-colors">
+                        <button className="w-full bg-foreground text-background py-3 text-[11px] font-bold uppercase tracking-widest hover:bg-foreground/90 transition-colors cursor-pointer rounded-sm">
                             Show {props.productCount} Results
                         </button>
                     </DrawerClose>

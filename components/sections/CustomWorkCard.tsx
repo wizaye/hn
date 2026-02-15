@@ -48,7 +48,7 @@ export function CustomWorkCard({ title, description, image }: CustomWorkCardProp
                         )}
                     </div>
                 </DialogTrigger>
-                <DialogContent className="max-w-3xl w-[90vw] p-4 rounded-none bg-background">
+                <DialogContent className="max-w-3xl w-[90vw] p-4 rounded-sm bg-background">
                     <DialogTitle className="sr-only">{title}</DialogTitle>
                     <div className="relative w-full aspect-square bg-muted/20">
                         {image && !imageError && (
@@ -60,7 +60,7 @@ export function CustomWorkCard({ title, description, image }: CustomWorkCardProp
                         )}
                     </div>
                     <div className="text-center mt-4">
-                        <h3 className="text-2xl font-bold italic">{title}</h3>
+                        <h3 className="text-2xl font-bold">{title}</h3>
                         <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto">{description}</p>
                     </div>
                 </DialogContent>
@@ -69,7 +69,7 @@ export function CustomWorkCard({ title, description, image }: CustomWorkCardProp
             {/* Info Section */}
             <div className="flex flex-col flex-1 gap-1">
                 {/* Title */}
-                <h3 className="text-base sm:text-lg font-bold italic line-clamp-2 min-h-[3.5rem]">
+                <h3 className="text-base sm:text-lg font-bold line-clamp-2 min-h-[3.5rem]">
                     {title}
                 </h3>
 

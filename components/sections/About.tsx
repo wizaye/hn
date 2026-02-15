@@ -3,9 +3,8 @@
 import { FramerCarousel } from "@/components/ui/framer-carousel";
 
 const images = [
-  "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=800&h=600&fit=crop",
-  "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=800&h=600&fit=crop",
+  "/shop/shop1.jpeg",
+  "/shop/shop2.jpeg",
 ];
 
 export function About() {

@@ -97,10 +97,10 @@ export function Navbar() {
                         href={`/products?category=${category}`}
                         className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       >
-                        <div className="text-sm font-medium leading-none">
+                        <div className="text-sm font-medium leading-none capitalize">
                           {getCategoryDisplayName(category)}
                         </div>
-                        <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
+                        <p className="line-clamp-1 text-xs leading-snug text-muted-foreground capitalize">
                           Browse {getCategoryDisplayName(category).toLowerCase()}
                         </p>
                       </Link>
@@ -144,16 +144,16 @@ export function Navbar() {
 
           <Link
             href="/enquire"
-            className="hidden lg:flex h-10 items-center justify-center rounded-full bg-black px-6 text-xs font-bold text-white shadow-sm transition-all duration-200 active:scale-[0.98] hover:bg-black/80 uppercase tracking-wider"
+            className="hidden lg:flex items-center text-sm font-bold text-black hover:text-black/70 transition-colors"
           >
-            Enquire Now
+            Enquire Now &rarr;
           </Link>
         </div>
 
         {/* Mobile - Menu Button on Right (Black Box) */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden ml-4 z-50 flex flex-col items-center justify-center gap-[5px] active:scale-95 transition-all cursor-pointer relative p-2"
+          className="lg:hidden ml-4 z-50 flex flex-col items-center justify-center gap-[5px] active:scale-95 transition-all cursor-pointer relative p-2 w-10 h-10"
           aria-label="Toggle Menu"
         >
           {isOpen ? (
@@ -175,14 +175,14 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="absolute top-full left-0 right-0 z-40 bg-white flex flex-col p-6 shadow-2xl overflow-y-auto overflow-x-hidden max-w-[100vw] lg:hidden border-t border-black/5"
+            className="absolute top-full left-0 right-0 z-40 bg-white flex flex-col p-6 overflow-y-auto overflow-x-hidden max-w-[100vw] lg:hidden border-t border-black/5"
             style={{ height: 'calc(100vh - 64px)' }}
           >
             <div className="flex flex-col gap-6 mt-4">
               <Link
                 href="/"
                 onClick={() => setIsOpen(false)}
-                className="text-2xl font-bold text-black hover:text-[#C2F13C] transition-colors border-b border-black/10 pb-4"
+                className="text-lg font-medium text-black hover:text-[#C2F13C] transition-colors border-b border-black/10 pb-4 capitalize"
               >
                 Home
               </Link>
@@ -191,7 +191,7 @@ export function Navbar() {
               <div className="border-b border-black/10 pb-4">
                 <button
                   onClick={() => setIsProductsOpen(!isProductsOpen)}
-                  className="flex w-full items-center justify-between text-2xl font-bold text-black hover:text-[#C2F13C] transition-colors"
+                  className="flex w-full items-center justify-between text-lg font-medium text-black hover:text-[#C2F13C] transition-colors capitalize"
                 >
                   <span>Products</span>
                   <ChevronDown
@@ -212,7 +212,7 @@ export function Navbar() {
                       <div className="flex flex-col gap-4 pl-4 pt-4 pb-2">
                         <Link
                           href="/products"
-                          className="text-lg font-medium text-black/70 hover:text-black transition-colors"
+                          className="text-base font-medium text-black/70 hover:text-black transition-colors capitalize"
                           onClick={() => setIsOpen(false)}
                         >
                           All Categories
@@ -221,7 +221,7 @@ export function Navbar() {
                           <Link
                             key={category}
                             href={`/products?category=${category}`}
-                            className="text-lg font-medium text-black/70 hover:text-black transition-colors"
+                            className="text-base font-medium text-black/70 hover:text-black transition-colors capitalize"
                             onClick={() => setIsOpen(false)}
                           >
                             {getCategoryDisplayName(category)}
@@ -236,14 +236,14 @@ export function Navbar() {
               <Link
                 href="/#custom-work"
                 onClick={() => setIsOpen(false)}
-                className="text-2xl font-bold text-black hover:text-[#C2F13C] transition-colors border-b border-black/10 pb-4"
+                className="text-lg font-medium text-black hover:text-[#C2F13C] transition-colors border-b border-black/10 pb-4 capitalize"
               >
                 Custom Work
               </Link>
               <Link
                 href="/contact"
                 onClick={() => setIsOpen(false)}
-                className="text-2xl font-bold text-black hover:text-[#C2F13C] transition-colors border-b border-black/10 pb-4"
+                className="text-lg font-medium text-black hover:text-[#C2F13C] transition-colors border-b border-black/10 pb-4 capitalize"
               >
                 Contact
               </Link>
@@ -251,7 +251,7 @@ export function Navbar() {
               <Link
                 href="/enquire"
                 onClick={() => setIsOpen(false)}
-                className="text-2xl text-black hover:text-black/70 transition-colors pb-4 font-bold"
+                className="text-lg text-black hover:text-black/70 transition-colors pb-4 font-bold capitalize"
               >
                 Enquire Now &rarr;
               </Link>

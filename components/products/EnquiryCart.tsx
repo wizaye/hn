@@ -159,7 +159,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
           <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-[1fr_380px]">
 
             {/* Items Column */}
-            <div className="h-full overflow-y-auto bg-background p-0 scrollbar-thin">
+            <div className={cn("h-full overflow-y-auto bg-background p-0 scrollbar-thin", items.length === 0 && "md:col-span-2")}>
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center p-8">
                   <div className="w-20 h-20 rounded-full bg-muted/20 flex items-center justify-center mb-6">
@@ -217,7 +217,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground hidden sm:block">Qty</label>
                               <div className="flex items-center border rounded-sm bg-background h-9 shadow-sm">
                                 <button
-                                  className="h-full w-9 flex items-center justify-center border-r hover:bg-muted disabled:opacity-50 transition-colors"
+                                  className="h-full w-9 flex items-center justify-center border-r hover:bg-muted disabled:opacity-50 transition-colors cursor-pointer"
                                   onClick={() => updateQuantity(item.productId, item.variantId, item.quantity - 1)}
                                   disabled={item.quantity <= 1}
                                 >
@@ -232,7 +232,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
                                   className="w-12 h-full border-none text-center focus-visible:ring-0 p-0 shadow-none rounded-none font-medium text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none"
                                 />
                                 <button
-                                  className="h-full w-9 flex items-center justify-center border-l hover:bg-muted transition-colors"
+                                  className="h-full w-9 flex items-center justify-center border-l hover:bg-muted transition-colors cursor-pointer"
                                   onClick={() => updateQuantity(item.productId, item.variantId, item.quantity + 1)}
                                 >
                                   <Plus className="w-3 h-3" />
@@ -244,7 +244,7 @@ export function EnquiryCart({ controlledOpen, onOpenChange }: EnquiryCartProps =
 
                             <button
                               onClick={() => handleDeleteItem(item.productId, item.variantId)}
-                              className="text-sm font-medium text-muted-foreground hover:text-destructive hover:underline flex items-center gap-1.5 transition-colors"
+                              className="text-sm font-medium text-muted-foreground hover:text-destructive hover:underline flex items-center gap-1.5 transition-colors cursor-pointer"
                             >
                               {deletingItem?.productId === item.productId && deletingItem?.variantId === item.variantId ? <Spinner className="w-3.5 h-3.5" /> : "Remove"}
                             </button>
