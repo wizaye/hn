@@ -142,8 +142,10 @@ export async function getPaginatedProducts(options: {
   category?: string;
   search?: string;
   sort?: string;
+  minPrice?: number;
+  maxPrice?: number;
 }) {
-  const { page, limit, category, search, sort } = options;
+  const { page, limit, category, search, sort, minPrice, maxPrice } = options;
   const offset = (page - 1) * limit;
 
   try {
@@ -160,13 +162,31 @@ export async function getPaginatedProducts(options: {
       return { products: [], total: 0 };
     }
 
-    // Build search WHERE clause
+    // Build WHERE clause (shared across queries)
     const buildWhere = () => {
-      if (!search) return { clause: '', params: [] as any[] };
-      const searchPattern = `%${search}%`;
+      const conditions: string[] = [];
+      const params: any[] = [];
+
+      if (search) {
+        const searchPattern = `%${search}%`;
+        conditions.push(`(model LIKE ? OR model_number LIKE ? OR color LIKE ?)`);
+        params.push(searchPattern, searchPattern, searchPattern);
+      }
+
+      if (minPrice !== undefined) {
+        conditions.push(`CAST(price AS REAL) >= ?`);
+        params.push(minPrice);
+      }
+
+      if (maxPrice !== undefined && maxPrice !== Infinity) {
+        conditions.push(`CAST(price AS REAL) <= ?`);
+        params.push(maxPrice);
+      }
+
+      if (conditions.length === 0) return { clause: '', params: [] };
       return {
-        clause: ` WHERE (model LIKE ? OR model_number LIKE ? OR color LIKE ?)`,
-        params: [searchPattern, searchPattern, searchPattern],
+        clause: ` WHERE ${conditions.join(' AND ')}`,
+        params,
       };
     };
     const { clause: whereClause, params: searchParams } = buildWhere();

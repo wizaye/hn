@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category') || undefined;
     const search = searchParams.get('search') || undefined;
     const sort = searchParams.get('sort') || undefined;
+    const minPrice = searchParams.get('minPrice') ? parseInt(searchParams.get('minPrice')!, 10) : undefined;
+    const maxPrice = searchParams.get('maxPrice') ? parseInt(searchParams.get('maxPrice')!, 10) : undefined;
 
     const { products, total } = await getPaginatedProducts({
       page,
@@ -26,6 +28,8 @@ export async function GET(request: NextRequest) {
       category,
       search,
       sort,
+      minPrice,
+      maxPrice,
     });
 
     const totalPages = Math.ceil(total / limit);

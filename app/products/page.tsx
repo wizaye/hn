@@ -82,6 +82,13 @@ function ProductsContent() {
       if (selectedFilters.categories.length === 1) {
         params.set('category', selectedFilters.categories[0]);
       }
+      if (selectedFilters.priceRange) {
+        params.set('minPrice', String(selectedFilters.priceRange.min));
+        if (selectedFilters.priceRange.max !== Infinity) {
+          params.set('maxPrice', String(selectedFilters.priceRange.max));
+        }
+      }
+
       if (searchQuery.trim()) {
         params.set('search', searchQuery.trim());
       }
@@ -110,7 +117,7 @@ function ProductsContent() {
       setIsLoading(false);
       setIsPageLoading(false);
     }
-  }, [selectedFilters.categories, searchQuery, sortBy]);
+  }, [selectedFilters, searchQuery, sortBy]);
 
   // Update filters when URL changes
   useEffect(() => {
@@ -147,16 +154,8 @@ function ProductsContent() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [fetchProducts]);
 
-  // Apply client-side price filter (can't easily do this in D1 SQL since price storage varies)
-  const displayProducts = selectedFilters.priceRange
-    ? products.filter((p) => {
-      const price = p.variants?.[0]?.price || 0;
-      return (
-        price >= selectedFilters.priceRange!.min &&
-        price <= selectedFilters.priceRange!.max
-      );
-    })
-    : products;
+  // Use products directly (server-side filtered)
+  const displayProducts = products;
 
   const [isMobile, setIsMobile] = useState(false);
 

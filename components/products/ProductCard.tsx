@@ -91,13 +91,13 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
                     <>
                       <button
                         onClick={handlePrevImage}
-                        className="absolute left-1 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 bg-background/80 hover:bg-background border border-foreground/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-full shadow-sm"
+                        className="absolute left-1 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 bg-white dark:bg-zinc-800 text-black dark:text-white border border-black/10 shadow-md flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10 rounded-full"
                       >
                         <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                       <button
                         onClick={handleNextImage}
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 bg-background/80 hover:bg-background border border-foreground/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-full shadow-sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 bg-white dark:bg-zinc-800 text-black dark:text-white border border-black/10 shadow-md flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10 rounded-full"
                       >
                         <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
