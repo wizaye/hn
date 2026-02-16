@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hyderabad Networks - Premium Corporate Clocks",
+  title: "Hyderabad Network - Authorized Distributors of Orpat Clocks",
   description: "Premium corporate clock solutions for bulk gifting and custom branding",
 };
 
