@@ -9,8 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { EnquiryCart } from "@/components/products/EnquiryCart";
 import { toast } from "sonner";
+import { SuccessScreen } from "@/components/ui/SuccessScreen";
 
 export default function ContactPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,10 +22,16 @@ export default function ContactPage() {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
     console.log("General Enquiry:", formData);
-    toast.success("Enquiry submitted successfully! We'll contact you soon.");
+    toast.success("Enquiry submitted successfully!");
+
     setFormData({
       name: "",
       email: "",
@@ -30,7 +39,22 @@ export default function ContactPage() {
       company: "",
       message: "",
     });
+    setShowSuccess(true);
+    setIsSubmitting(false);
   };
+
+  if (showSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <SuccessScreen
+          title="Message Sent!"
+          message="We've received your message and will get back to you shortly."
+          redirectPath="/"
+          redirectSeconds={5}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -58,6 +82,7 @@ export default function ContactPage() {
                     placeholder="Your name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="space-y-2">
@@ -69,6 +94,7 @@ export default function ContactPage() {
                     placeholder="your@email.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -82,6 +108,7 @@ export default function ContactPage() {
                     placeholder="+91 XXXX XXXX XX"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="space-y-2">
@@ -91,6 +118,7 @@ export default function ContactPage() {
                     placeholder="Your company name"
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -105,11 +133,12 @@ export default function ContactPage() {
                 placeholder="Tell us about your enquiry..."
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                disabled={isSubmitting}
               />
             </div>
 
-            <Button type="submit" className="w-full cursor-pointer" size="lg">
-              Submit Enquiry
+            <Button type="submit" className="w-full cursor-pointer" size="lg" disabled={isSubmitting}>
+              {isSubmitting ? "Sending..." : "Submit Enquiry"}
             </Button>
           </form>
         </div>

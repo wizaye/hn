@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { ShoppingCart, Edit } from "lucide-react";
 import { EnquiryCart, useCartOpen } from "@/components/products/EnquiryCart";
+import { SuccessScreen } from "@/components/ui/SuccessScreen";
 
 function GeneralEnquiryForm() {
   const [formData, setFormData] = useState({
@@ -110,7 +111,6 @@ function DetailedProductEnquiryForm() {
   const { setIsOpen: setCartOpen } = useCartOpen();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [redirectTimer, setRedirectTimer] = useState(5);
   const [needsCustomization, setNeedsCustomization] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -168,18 +168,6 @@ function DetailedProductEnquiryForm() {
 
         // Show success screen
         setShowSuccess(true);
-
-        // Start countdown timer
-        const interval = setInterval(() => {
-          setRedirectTimer((prev) => {
-            if (prev <= 1) {
-              clearInterval(interval);
-              window.location.href = '/';
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
       } else {
         toast.error(result.error || "Failed to submit enquiry. Please try again.");
       }
@@ -194,66 +182,28 @@ function DetailedProductEnquiryForm() {
   // Success screen
   if (showSuccess) {
     return (
-      <div className="max-w-md mx-auto">
-        <div className="rounded-sm border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-8 text-center space-y-6">
-          {/* Success Icon */}
-          <div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-            <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-
-          {/* Success Message */}
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-green-900 dark:text-green-100">Enquiry Submitted!</h2>
-            <p className="text-green-700 dark:text-green-300">
-              Thank you for your enquiry. We've sent a confirmation email with all the details.
-            </p>
-          </div>
-
-          {/* Timer */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-center gap-2 text-sm text-green-600 dark:text-green-400">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Redirecting to home in {redirectTimer} seconds...</span>
-            </div>
-
-            <Button
-              onClick={() => window.location.href = '/'}
-              className="w-full bg-green-600 hover:bg-green-700 cursor-pointer"
-              size="lg"
-            >
-              Go to Home Now
-            </Button>
-          </div>
-
-          {/* What's Next */}
-          <div className="pt-4 border-t border-green-200 dark:border-green-800 text-sm text-left space-y-2">
-            <p className="font-semibold text-green-900 dark:text-green-100">What happens next?</p>
-            <ul className="space-y-1 text-green-700 dark:text-green-300">
-              <li className="flex items-start gap-2">
-                <span className="text-green-500">✓</span>
-                <span>Our team will review your enquiry within 24 hours</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-500">✓</span>
-                <span>You'll receive a detailed quotation via email</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-500">✓</span>
-                <span>We'll contact you to discuss customization details</span>
-              </li>
-            </ul>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <SuccessScreen
+          title="Enquiry Submitted!"
+          message="Thank you for your enquiry. We've sent a confirmation email with all the details."
+          redirectPath="/"
+          redirectSeconds={5}
+        />
       </div>
     );
   }
 
   return (
     <>
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-muted-foreground tracking-tight mb-2">
+          Product <span className="text-foreground">Enquiry</span>
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          Fill out the form below with your details and selected products
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <h3 className="text-[11px] font-bold uppercase tracking-widest">Personal Information</h3>
@@ -453,15 +403,6 @@ export default function EnquirePage() {
       <Navbar />
       <main className="px-6 md:px-10 lg:px-16 py-8 sm:py-10 md:py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-muted-foreground tracking-tight mb-2">
-              Product <span className="text-foreground">Enquiry</span>
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Fill out the form below with your details and selected products
-            </p>
-          </div>
-
           <DetailedProductEnquiryForm />
         </div>
       </main>

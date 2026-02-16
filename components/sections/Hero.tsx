@@ -1,61 +1,67 @@
-"use client";
-
+import { ArrowRight } from 'lucide-react';
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 export function Hero() {
   return (
-    <section className="relative h-screen w-full overflow-hidden">
-      {/* Video Background */}
-      <div className="absolute inset-0 z-0">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="h-full w-full object-cover brightness-50"
-          suppressHydrationWarning
-        >
-          {/* <source src="https://videos.pexels.com/video-files/2795392/2795392-uhd_2560_1440_25fps.mp4" type="video/mp4" /> */}
-          <source src="/bg_video_2.mp4" type="video/mp4" />
-        </video>
-        {/* Gradient overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
-      </div>
+    <section className="py-24 lg:py-32">
+      <div className="container px-4 md:px-6 mx-auto">
+        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
+          <div className="flex flex-col items-start gap-6 text-left">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight text-muted-foreground">
+              Premium Corporate <span className="text-foreground block mt-1">Clocks for Gifting</span>
+            </h1>
 
-      {/* Content */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center container mx-auto px-4 sm:px-6 md:px-8 max-w-5xl text-center text-white">
-        <p className="mb-4 text-sm font-medium uppercase tracking-widest text-white/70">
-          Hyderabad Network
-        </p>
-        <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-          Premium Corporate
-          <br />
-          <span className="bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
-            Clocks for Gifting
-          </span>
-        </h1>
-        <p className="mb-10 max-w-2xl text-lg text-white/80 sm:text-xl">
-          Custom branding • Competitive bulk pricing
-        </p>
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <Button
-            asChild
-            size="lg"
-            className="bg-white text-black hover:bg-white/90 font-semibold px-8"
-          >
-            <Link href="/enquire">
-              Get a Quote
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            size="lg"
-            className="bg-transparent text-white border-white/30 hover:bg-white/10 hover:border-white/50 px-8"
-          >
-            <Link href="/products">Browse Catalog</Link>
-          </Button>
+            <p className="max-w-xl text-lg text-muted-foreground lg:text-xl leading-relaxed">
+              Elevate your corporate gifting with our exquisite collection of custom-branded clocks. Competitive bulk pricing available.
+            </p>
+
+            <div className="flex w-full flex-col justify-start gap-3 sm:flex-row pt-2">
+              <Button asChild size="lg" className="w-full sm:w-auto px-8">
+                <Link href="/enquire">Get a Quote</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto px-8">
+                <Link href="/products">
+                  Browse Catalog
+                  <ArrowRight className="ml-2 size-4" />
+                </Link>
+              </Button>
+            </div>
+
+            {/* Metrics removed as per user request */}
+          </div>
+
+          <div className="relative w-full h-full min-h-[400px] lg:min-h-full">
+            <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-4 sm:gap-6 lg:gap-8">
+              <div className="col-span-1 row-span-2">
+                <div className="h-full w-full overflow-hidden rounded-xl sm:rounded-2xl xl:rounded-3xl shadow-lg">
+                  <img
+                    alt="Elegant wall clock"
+                    className="h-full w-full object-cover object-center hover:scale-105 transition-transform duration-500"
+                    src="/hero/gf-left.jpeg"
+                  />
+                </div>
+              </div>
+              <div className="col-span-1 row-span-1">
+                <div className="h-full w-full overflow-hidden rounded-xl sm:rounded-2xl xl:rounded-3xl shadow-lg">
+                  <img
+                    alt="Modern desk setup"
+                    className="h-full w-full object-cover object-center hover:scale-105 transition-transform duration-500"
+                    src="/hero/designer-right.jpeg"
+                  />
+                </div>
+              </div>
+              <div className="col-span-1 row-span-1">
+                <div className="h-full w-full overflow-hidden rounded-xl sm:rounded-2xl xl:rounded-3xl shadow-lg">
+                  <img
+                    alt="Luxury timepiece"
+                    className="h-full w-full object-cover object-center hover:scale-105 transition-transform duration-500"
+                    src="/hero/fancy-right.jpeg"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

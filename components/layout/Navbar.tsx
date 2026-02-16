@@ -16,32 +16,15 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getCategoryDisplayName } from "@/lib/product-helpers";
 import { useCartOpen } from "@/components/products/EnquiryCart";
 import { useEnquiryCart } from "@/hooks/use-enquiry-cart";
+import { PRODUCT_CATEGORIES } from "@/lib/categories";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
   const { setIsOpen: setIsCartOpen } = useCartOpen();
   const { uniqueProductsCount } = useEnquiryCart();
-
-  // Fetch categories on mount
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const response = await fetch('/api/products/categories');
-        const data = await response.json();
-        if (data.success) {
-          setCategories(data.data.map((c: any) => c.category));
-        }
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-      }
-    }
-    fetchCategories();
-  }, []);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -79,32 +62,33 @@ export function Navbar() {
             <NavigationMenuItem>
               <NavigationMenuTrigger>Products</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <div className="grid gap-0.5 p-2 w-[240px]">
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href="/products"
-                      className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    >
-                      <div className="text-sm font-medium leading-none">All Categories</div>
-                      <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
-                        Browse our complete catalog
-                      </p>
-                    </Link>
-                  </NavigationMenuLink>
-                  {categories.map((category) => (
-                    <NavigationMenuLink key={category} asChild>
+                <div className="grid grid-cols-2 gap-4 p-4 w-[600px]">
+                  <div className="col-span-2 pb-2 mb-2 border-b border-border/50">
+                    <NavigationMenuLink asChild>
                       <Link
-                        href={`/products?category=${category}`}
-                        className="block select-none space-y-0.5 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        href="/products"
+                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       >
-                        <div className="text-sm font-medium leading-none capitalize">
-                          {getCategoryDisplayName(category)}
-                        </div>
-                        <p className="line-clamp-1 text-xs leading-snug text-muted-foreground capitalize">
-                          Browse {getCategoryDisplayName(category).toLowerCase()}
-                        </p>
+                        <div className="text-sm font-medium leading-none">All Categories</div>
                       </Link>
                     </NavigationMenuLink>
+                  </div>
+                  {PRODUCT_CATEGORIES.map((group, index) => (
+                    <div key={index} className="space-y-1">
+                      <h4 className="px-2 text-xs font-semibold text-muted-foreground mb-1 mt-1">
+                        {group.title}
+                      </h4>
+                      {group.items.map((item) => (
+                        <NavigationMenuLink key={item.id} asChild>
+                          <Link
+                            href={`/products?category=${item.id}`}
+                            className="block select-none rounded-md px-2 py-1.5 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            {item.name}
+                          </Link>
+                        </NavigationMenuLink>
+                      ))}
+                    </div>
                   ))}
                 </div>
               </NavigationMenuContent>
@@ -217,15 +201,22 @@ export function Navbar() {
                         >
                           All Categories
                         </Link>
-                        {categories.map((category) => (
-                          <Link
-                            key={category}
-                            href={`/products?category=${category}`}
-                            className="text-base font-medium text-black/70 hover:text-black transition-colors capitalize"
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {getCategoryDisplayName(category)}
-                          </Link>
+                        {PRODUCT_CATEGORIES.map((group, index) => (
+                          <div key={index} className="flex flex-col gap-2">
+                            <h4 className="text-sm font-semibold text-black/40 uppercase tracking-wider mt-2">
+                              {group.title}
+                            </h4>
+                            {group.items.map((item) => (
+                              <Link
+                                key={item.id}
+                                href={`/products?category=${item.id}`}
+                                className="text-base font-medium text-black/70 hover:text-black transition-colors pl-2"
+                                onClick={() => setIsOpen(false)}
+                              >
+                                {item.name}
+                              </Link>
+                            ))}
+                          </div>
                         ))}
                       </div>
                     </motion.div>
