@@ -145,24 +145,24 @@ export function AddToEnquiryModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto rounded-sm border border-border">
-        <DialogHeader className="space-y-4">
-          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/60">
+      <DialogContent className="w-[95vw] sm:max-w-[500px] max-h-[90vh] overflow-y-auto rounded-sm border border-border p-4 sm:p-6">
+        <DialogHeader className="space-y-1.5 sm:space-y-4">
+          <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/60 hidden sm:block">
             Manage Enquiry
           </div>
-          <DialogTitle className="text-2xl font-bold tracking-wide">
+          <DialogTitle className="text-xl sm:text-2xl font-bold tracking-wide">
             {product.modelNumber}
           </DialogTitle>
-          <DialogDescription className="text-[11px] uppercase tracking-widest text-foreground/60">
+          <DialogDescription className="text-[10px] sm:text-[11px] uppercase tracking-widest text-foreground/60 hidden sm:block">
             Add, edit, or remove variants from your enquiry list
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-6 py-6">
+        <div className="grid gap-4 sm:gap-6 py-2 sm:py-6">
           {/* Existing Variants in Cart */}
           {cartItems.length > 0 && (
             <>
-              <div className="space-y-3">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em]">
+              <div className="space-y-2 sm:space-y-3">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em]">
                   Current Variants in Enquiry
                 </label>
                 <div className="border border-border rounded-sm divide-y divide-border">
@@ -217,8 +217,8 @@ export function AddToEnquiryModal({
           )}
 
           {/* Add/Edit Variant Form */}
-          <div className="space-y-5">
-            <label className="text-[11px] font-bold uppercase tracking-[0.2em]">
+          <div className="space-y-3 sm:space-y-5">
+            <label className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em]">
               {isEditing ? "Edit Variant" : hasAnyVariantInCart ? "Add Another Variant" : "Add Variant"}
             </label>
 
@@ -265,15 +265,15 @@ export function AddToEnquiryModal({
             </div>
 
             {selectedVariantData && (
-              <div className="border border-border rounded-sm p-4 bg-muted/30">
-                <div className="text-[11px] uppercase tracking-widest space-y-2">
+              <div className="border border-border rounded-sm p-3 sm:p-4 bg-muted/30">
+                <div className="text-[10px] sm:text-[11px] uppercase tracking-widest space-y-1.5 sm:space-y-2">
                   <div className="flex justify-between">
                     <span className="text-foreground/60">Price per unit</span>
                     <span className="font-bold">{formatCurrency(selectedVariantData.price, 'INR')}</span>
                   </div>
-                  <div className="flex justify-between border-t border-border pt-2">
+                  <div className="flex justify-between border-t border-border pt-1.5 sm:pt-2">
                     <span className="text-foreground/60">{parseInt(quantity) || 1} × {formatCurrency(selectedVariantData.price, 'INR')}</span>
-                    <span className="font-black text-base">
+                    <span className="font-black text-sm sm:text-base">
                       {formatCurrency(selectedVariantData.price * (parseInt(quantity) || 1), 'INR')}
                     </span>
                   </div>
@@ -284,11 +284,11 @@ export function AddToEnquiryModal({
             <Button
               onClick={handleUpdateCart}
               disabled={isLoading}
-              className="w-full rounded-sm bg-foreground text-background hover:bg-foreground/90 h-12 text-[11px] font-black uppercase tracking-widest cursor-pointer"
+              className="w-full rounded-sm bg-foreground text-background hover:bg-foreground/90 h-10 sm:h-12 text-[10px] sm:text-[11px] font-black uppercase tracking-widest cursor-pointer"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                   {hasAnyVariantInCart ? "Updating..." : "Adding..."}
                 </>
               ) : (

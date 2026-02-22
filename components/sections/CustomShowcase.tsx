@@ -68,7 +68,7 @@ export function CustomShowcase() {
           {/* Right fade */}
           <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
 
-          <Marquee pauseOnHover className="[--duration:40s]">
+          <Marquee pauseOnHover className="[--duration:40s] overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {showcaseItems.map((item, idx) => (
               <div key={idx} className="mx-3 w-[240px] sm:w-[280px] h-full">
                 <CustomWorkCard

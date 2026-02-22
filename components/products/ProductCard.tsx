@@ -158,7 +158,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
           {/* Available Colors Text */}
           {images.length > 1 && (
             <p className="text-[9px] sm:text-[10px] text-muted-foreground/80 line-clamp-1 mb-1">
-              {images.map((img: any) => img.color || 'Variant').join(', ')}
+              Color variants: {images.map((img: any) => img.color || 'Variant').join(', ')}
             </p>
           )}
 
@@ -167,7 +167,7 @@ export function ProductCard({ product, showAddToEnquiry = false }: ProductCardPr
             <div className="flex justify-between items-end mb-2 sm:mb-3">
               <div className="flex flex-col">
                 <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-[0.15em] text-muted-foreground">B2B Price</span>
-                <span className="text-xs sm:text-sm font-bold uppercase">{formatCurrency(displayPrice, 'INR')}</span>
+                <span className="text-sm sm:text-lg font-black uppercase text-foreground">{formatCurrency(displayPrice, 'INR')}</span>
               </div>
               {mounted && isInCart && (
                 <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-[0.15em] text-green-600">
