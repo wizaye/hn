@@ -357,3 +357,29 @@ export async function getProductById(categoryName: string, productId: string) {
     throw error;
   }
 }
+
+/**
+ * Get active banners for the public frontend
+ */
+export async function getActiveBanners(): Promise<Array<{
+  id: number;
+  title: string;
+  description: string | null;
+  discount_text: string | null;
+  link: string | null;
+  bg_color: string;
+  text_color: string;
+  end_date: string | null;
+}>> {
+  try {
+    return await queryD1(
+      `SELECT id, title, description, discount_text, link, bg_color, text_color, end_date
+       FROM banners
+       WHERE active = 1
+       ORDER BY created_at DESC`
+    );
+  } catch (error) {
+    console.error('Error fetching active banners:', error);
+    return [];
+  }
+}
