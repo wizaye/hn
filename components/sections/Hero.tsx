@@ -9,7 +9,7 @@ export function Hero() {
         <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col items-start gap-6 text-left">
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight text-muted-foreground">
-              Premium Corporate <span className="text-foreground block mt-1">Clocks for Gifting</span>
+              Corporate <span className="text-foreground block mt-1">Clocks for Gifting</span>
             </h1>
 
             <p className="max-w-xl text-lg text-muted-foreground lg:text-xl leading-relaxed">
