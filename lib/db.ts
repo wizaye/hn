@@ -169,8 +169,8 @@ export async function getPaginatedProducts(options: {
 
       if (search) {
         const searchPattern = `%${search}%`;
-        conditions.push(`(model LIKE ? OR model_number LIKE ? OR color LIKE ?)`);
-        params.push(searchPattern, searchPattern, searchPattern);
+        conditions.push(`(model LIKE ? OR color LIKE ?)`);
+        params.push(searchPattern, searchPattern);
       }
 
       if (minPrice !== undefined) {
@@ -333,7 +333,7 @@ export async function getProductById(categoryName: string, productId: string) {
 
   try {
     const products = await queryD1(
-      `SELECT * FROM ${tableName} WHERE id = ? OR model_number = ? LIMIT 1`,
+      `SELECT * FROM ${tableName} WHERE id = ? OR model = ? LIMIT 1`,
       [productId, productId]
     );
 
@@ -349,8 +349,8 @@ export async function getProductById(categoryName: string, productId: string) {
         ? `${R2_PUBLIC_URL}/${product.image_path}`
         : null),
       category: categoryName,
-      // Use model_number as primary identifier
-      id: product.model_number || product.id,
+      // Use model as primary identifier
+      id: product.model || product.id,
     };
   } catch (error) {
     console.error(`Error fetching product ${productId} from ${categoryName}:`, error);

@@ -46,7 +46,7 @@ export function getCustomerConfirmationEmail(data: CustomerEnquiryData) {
           Hyderabad Network
         </h1>
         <p style="margin: 8px 0 0; color: #666666; font-size: 15px; font-weight: 400;">
-          Premium Clock Manufacturer
+          (Distributor of ajanta orpat group)
         </p>
       </td>
     </tr>
@@ -151,7 +151,8 @@ export function getCustomerConfirmationEmail(data: CustomerEnquiryData) {
         
         <p style="margin: 8px 0 0; color: #333333; font-size: 14px; line-height: 1.6;">
           Best regards,<br>
-          <strong>Hyderabad Network Team</strong>
+          <strong>Hyderabad Network</strong><br>
+          (Distributor of ajanta orpat group)
         </p>
       </td>
     </tr>
@@ -163,10 +164,10 @@ export function getCustomerConfirmationEmail(data: CustomerEnquiryData) {
           HYDERABAD NETWORK
         </p>
         <p style="margin: 0 0 8px; color: #cccccc; font-size: 12px; text-align: center;">
-          Premium Clock Manufacturer
+          (Distributor of ajanta orpat group)
         </p>
         <p style="margin: 0 0 8px; color: #cccccc; font-size: 12px; text-align: center;">
-          Email: info@hyderabadnetwork.com | Phone: +91 XXX XXX XXXX
+          Email: info@hyderabadnetwork.com | Phone: +91 7893002716
         </p>
         <p style="margin: 0; color: #999999; font-size: 11px; text-align: center;">
           © ${new Date().getFullYear()} Hyderabad Network. All rights reserved.
@@ -201,10 +202,11 @@ WHAT HAPPENS NEXT?
 4. Feel free to discuss customization or visit our store
 
 Best regards,
-Hyderabad Network Team
+Hyderabad Network
+(Distributor of ajanta orpat group)
 
 Email: info@hyderabadnetwork.com
-Phone: +91 XXX XXX XXXX
+Phone: +91 7893002716
     `
   };
 }
