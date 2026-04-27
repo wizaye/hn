@@ -37,13 +37,13 @@ const showcaseItems = [
   {
     title: "Box Customization",
     description: "Fully customized box packaging to match your corporate identity",
-    image: "",
+    image: "/custom_work/box_customisation.jpeg",
     gradient: ["rgb(255, 200, 100)", "rgb(100, 150, 255)", "rgb(255, 100, 150)"],
   },
   {
     title: "Customized Packing",
     description: "Specialized packing solutions ensuring safety and premium unboxing experience",
-    image: "",
+    image: "/custom_work/custom_packaging.jpeg",
     gradient: ["rgb(100, 200, 255)", "rgb(255, 150, 100)", "rgb(150, 255, 100)"],
   },
 ];
